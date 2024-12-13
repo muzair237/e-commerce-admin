@@ -1,0 +1,119 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "react-app",
+    "airbnb",
+    "plugin:jsx-a11y/recommended",
+    "prettier",
+    "plugin:import/errors",
+    "plugin:import/warnings"
+  ],
+  "plugins": ["@typescript-eslint", "jsx-a11y", "prettier"],
+  "ignorePatterns": ["./client/tests/*", "./client/styles/*"],
+  "rules": {
+    "indent": ["error", 2],
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "comma-dangle": ["error", "always-multiline"],
+    "no-unused-vars": ["warn"],
+    "max-nested-callbacks": ["error", 3],
+    "newline-before-return": "error",
+    "react/self-closing-comp": "error",
+    "jsx-a11y/alt-text": "warn",
+    "react/jsx-key": "error",
+    "react/prop-types": "error",
+    "react/jsx-boolean-value": ["error", "never"],
+    "react/jsx-no-bind": "warn",
+    "react/destructuring-assignment": ["warn", "always"],
+    "prefer-arrow-callback": "error",
+    "arrow-parens": ["error", "as-needed"],
+    "prefer-template": "error",
+    "react/no-access-state-in-setstate": "error",
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-param-reassign": ["error", { "props": true }],
+    "arrow-body-style": ["error", "as-needed"],
+    "curly": ["error", "all"],
+    "prefer-destructuring": ["error", { "object": true, "array": true }],
+    "prefer-spread": "error",
+    "prefer-object-spread": "error",
+    "no-multi-spaces": "error",
+    "max-depth": ["warn", 4],
+    "react/prefer-stateless-function": "warn",
+    "react/no-array-index-key": "warn",
+    "react/no-direct-mutation-state": "error",
+    "jsx-a11y/accessible-emoji": "warn",
+    "jsx-a11y/aria-role": ["error", { "ignoreNonDOM": true }],
+    "jsx-a11y/label-has-associated-control": ["error", { "assert": "either" }],
+    "react/no-unknown-property": ["error", { "ignore": ["css"] }],
+    "no-underscore-dangle": "off",
+    "semi": 0,
+    "camelcase": 0,
+    "no-nested-ternary": 0,
+    "import/no-cycle": "off",
+    "react-hooks/exhaustive-deps": 0,
+    "react/jsx-props-no-spreading": 0,
+    "react/require-default-props": 0,
+    "jsx-a11y/anchor-is-valid": 0,
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [".jsx"]
+      }
+    ],
+    "react/state-in-constructor": 0,
+    // imports
+    "import/no-extraneous-dependencies": 0,
+    "import/prefer-default-export": 0,
+    // prettier
+    "prettier/prettier": [
+      "error",
+      {
+        "trailingComma": "all",
+        "tabWidth": 2,
+        "printWidth": 120,
+        "semi": true,
+        "singleQuote": true,
+        "useTabs": false,
+        "quoteProps": "as-needed",
+        "jsxSingleQuote": false,
+        "bracketSpacing": true,
+        "jsxBracketSameLine": true,
+        "bracketSameLine": true,
+        "arrowParens": "avoid",
+        "requirePragma": false,
+        "insertPragma": false,
+        "proseWrap": "preserve",
+        "endOfLine": "auto"
+      }
+    ],
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          ["builtin", "external", "internal"], // Package imports come after React
+          ["parent", "sibling", "index"] // Component imports come last
+        ],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "builtin",
+            "position": "before"
+          },
+          {
+            "pattern": "@/components/**",
+            "group": "internal",
+            "position": "after"
+          }
+        ]
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "alias": {
+        "map": [["@", "./src"]],
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"]
+      }
+    }
+  }
+}

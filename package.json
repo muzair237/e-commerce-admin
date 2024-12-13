@@ -1,0 +1,100 @@
+{
+  "name": "e-commerce-admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "env-cmd -e development next dev",
+    "build": "next build",
+    "start": "env-cmd -e production next dev",
+    "lint": "next lint",
+    "lint:all": "yarn lint:css && yarn lint:js",
+    "lint:css": "stylelint \"./src/**/*.js\"",
+    "lint:js": "eslint --ext jsx,js src/",
+    "lint:js:fix": "eslint --ext jsx,js --fix src/",
+    "pre:commit": "lint-staged",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx,json,css,scss,md}\""
+  },
+  "lint-staged": {
+    " src/**/*.{js,jsx}": [
+      "eslint --fix"
+    ]
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
+  "eslintConfig": {
+    "extends": [
+      "react-app"
+    ],
+    "overrides": [
+      {
+        "files": [
+          "**/*.stories.*"
+        ],
+        "rules": {
+          "import/no-anonymous-default-export": "off"
+        }
+      }
+    ]
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.2.1",
+    "bootstrap": "5.2.3",
+    "date-fns": "^3.6.0",
+    "echarts-for-react": "^3.0.2",
+    "env-cmd": "^10.1.0",
+    "formik": "^2.4.5",
+    "i18next": "^23.11.1",
+    "i18next-browser-languagedetector": "^7.2.1",
+    "lodash": "^4.17.21",
+    "next": "14.1.0",
+    "react": "^18",
+    "react-countup": "^6.5.3",
+    "react-dom": "^18",
+    "react-flatpickr": "^3.10.13",
+    "react-hot-toast": "^2.4.1",
+    "react-i18next": "^14.1.0",
+    "react-icons": "^5.2.0",
+    "react-loading-skeleton": "^3.4.0",
+    "react-redux": "^9.1.0",
+    "react-responsive-carousel": "^3.2.22",
+    "react-select": "^5.8.0",
+    "react-table": "^7.8.0",
+    "react-tag-input-component": "^2.0.2",
+    "reactstrap": "^9.0.1",
+    "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^3.1.0",
+    "sass": "^1.71.1",
+    "simplebar-react": "^3.2.4",
+    "styled-components": "^6.1.8",
+    "use-context-hook": "^2.0.5",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "@types/react-select": "^5.0.1",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-flowtype": "^5.8.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "lint-staged": "^12.3.7",
+    "prettier": "^2.2.1",
+    "react-error-overlay": "6.0.9",
+    "stylelint": "^13.10.0",
+    "stylelint-config-recommended": "^5.0.0",
+    "stylelint-config-styled-components": "^0.1.1",
+    "stylelint-processor-styled-components": "^1.10.0"
+  }
+}
