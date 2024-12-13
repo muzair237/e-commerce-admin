@@ -15,6 +15,13 @@ import GaugeChart from '../components/Organisms/GuageChart';
 import RecentQueries from '../components/Organisms/RecentQueries';
 import PieChart from '../components/Organisms/PieChart';
 
-const Dashboard = () => <></>;
+const Dashboard = () => (
+  <>
+    <Head>
+      <title>WebNova | DASHBOARD</title>
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    </Head>
+  </>
+);
 
 export default withAuthProtection(Dashboard);

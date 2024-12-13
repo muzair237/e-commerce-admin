@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Collapse } from 'reactstrap';
-import { withTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import navdata from './LayoutMenuData';
 import withRouter from '../components/Common/withRouter';
@@ -88,7 +87,7 @@ const VerticalLayout = props => {
           {/* Main Header */}
           {item.isHeader ? (
             <li className="menu-title">
-              <span data-key="t-menu">{props.t(item.label)} </span>
+              <span data-key="t-menu">{item.label} </span>
             </li>
           ) : item.subItems ? (
             <li className="nav-item">
@@ -98,7 +97,7 @@ const VerticalLayout = props => {
                 href={item.link ? item.link : '/#'}
                 data-bs-toggle="collapse">
                 <i className={item.icon} />
-                <span data-key="t-apps">{props.t(item.label)}</span>
+                <span data-key="t-apps">{item.label}</span>
                 {item.badgeName ? (
                   <span className={`badge badge-pill bg-${item.badgeColor}`} data-key="t-new">
                     {item.badgeName}
@@ -114,7 +113,7 @@ const VerticalLayout = props => {
                         {!subItem.isChildItem ? (
                           <li className="nav-item">
                             <Link href={subItem.link ? subItem.link : '/#'} className="nav-link">
-                              {props.t(subItem.label)}
+                              {subItem.label}
                               {subItem.badgeName ? (
                                 <span className={`badge badge-pill bg-${subItem.badgeColor}`} data-key="t-new">
                                   {subItem.badgeName}
@@ -126,7 +125,7 @@ const VerticalLayout = props => {
                           <li className="nav-item">
                             <Link onClick={subItem.click} className="nav-link" href="/#" data-bs-toggle="collapse">
                               {' '}
-                              {props.t(subItem.label)}
+                              {subItem.label}
                               {subItem.badgeName ? (
                                 <span className={`badge badge-pill bg-${subItem.badgeColor}`} data-key="t-new">
                                   {subItem.badgeName}
@@ -142,7 +141,7 @@ const VerticalLayout = props => {
                                       {!childItem.childItems ? (
                                         <li className="nav-item">
                                           <Link href={childItem.link ? childItem.link : '/#'} className="nav-link">
-                                            {props.t(childItem.label)}
+                                            {childItem.label}
                                           </Link>
                                         </li>
                                       ) : (
@@ -152,7 +151,7 @@ const VerticalLayout = props => {
                                             className="nav-link"
                                             onClick={childItem.click}
                                             data-bs-toggle="collapse">
-                                            {props.t(childItem.label)}
+                                            {childItem.label}
                                           </Link>
                                           <Collapse
                                             className="menu-dropdown"
@@ -165,7 +164,7 @@ const VerticalLayout = props => {
                                                     href={subChildItem.link}
                                                     className="nav-link"
                                                     data-key="t-basic-action">
-                                                    {props.t(subChildItem.label)}{' '}
+                                                    {subChildItem.label}
                                                   </Link>
                                                 </li>
                                               ))}
@@ -188,7 +187,7 @@ const VerticalLayout = props => {
             allowedPages?.includes(item.path) && (
               <li className="nav-item">
                 <Link className="nav-link menu-link" href={item.path ? item.path : '/#'}>
-                  <i className={item.icon} /> <span>{props.t(item.label)}</span>
+                  <i className={item.icon} /> <span>{item.label}</span>
                   {item.badgeName ? (
                     <span className={`badge badge-pill bg-${item.badgeColor}`} data-key="t-new">
                       {item.badgeName}
@@ -204,4 +203,4 @@ const VerticalLayout = props => {
   );
 };
 
-export default withRouter(withTranslation()(VerticalLayout));
+export default withRouter(VerticalLayout);

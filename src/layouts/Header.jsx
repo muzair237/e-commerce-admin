@@ -11,7 +11,9 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
   const toogleMenuBtn = () => {
     const windowSize = document.documentElement.clientWidth;
 
-    if (windowSize > 767) document.querySelector('.hamburger-icon').classList.toggle('open');
+    if (windowSize > 767) {
+      document.querySelector('.hamburger-icon').classList.toggle('open');
+    }
 
     // For collapse horizontal menu
     if (document.documentElement.getAttribute('data-layout') === 'horizontal') {
@@ -54,6 +56,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass }) => {
       }
     }
   };
+
   return (
     <>
       <header id="page-topbar" className={headerClass}>
