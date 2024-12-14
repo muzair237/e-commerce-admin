@@ -1,34 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Field, useFormikContext, ErrorMessage } from 'formik';
-import { TagsInput } from 'react-tag-input-component';
 import Select from 'react-select';
 import TogglePasswordIcon from '../TogglePasswordIcon';
-import { Error } from './Input.styles';
+import { StyledInput, Error } from './Input.styles';
 
 const Input = ({ name, type, placeholder, value, defaultValue, options, ...props }) => {
-  const { setFieldValue, values } = useFormikContext();
+  const { setFieldValue, touched, values, errors } = useFormikContext();
   const [passwordShow, setPasswordShow] = useState(false);
-
   useEffect(() => {
-    if (defaultValue && defaultValue !== undefined) {
+    if (defaultValue) {
       setFieldValue(name, defaultValue);
-    } else if ((value !== undefined && !values[name]) || Array.isArray(value)) {
-      setFieldValue(name, value);
     }
   }, []);
+
+  const isInvalid = (touched[name] && !!errors[name]) || errors[name] === '';
+  const isRequiredError = errors?.[name]?.toLowerCase()?.includes('required');
 
   return (
     <>
       {type === 'password' ? (
         <>
-          <Field
+          {' '}
+          <StyledInput
+            $isInvalid={isInvalid}
             name={name}
             type={passwordShow ? 'text' : 'password'}
             className="form-control"
             placeholder={placeholder}
             {...props}
-          />
-          <TogglePasswordIcon onClick={() => setPasswordShow(!passwordShow)} {...props} />
+          />{' '}
+          <TogglePasswordIcon onClick={() => setPasswordShow(!passwordShow)} {...props} />{' '}
         </>
       ) : type === 'checkbox' ? (
         <Field name={name} type={type} className="form-check-input" />
@@ -38,14 +39,6 @@ const Input = ({ name, type, placeholder, value, defaultValue, options, ...props
           onChange={selectedOption => setFieldValue(name, selectedOption)}
           options={options}
           value={values[name] || value || defaultValue}
-          {...props}
-        />
-      ) : type === 'tags' ? (
-        <TagsInput
-          onChange={selectedTags => setFieldValue(name, selectedTags)}
-          name={name}
-          placeHolder={placeholder}
-          value={value || values[name]}
           {...props}
         />
       ) : type === 'textarea' ? (
@@ -59,7 +52,8 @@ const Input = ({ name, type, placeholder, value, defaultValue, options, ...props
           {...props}
         />
       ) : (
-        <Field
+        <StyledInput
+          $isInvalid={isInvalid}
           name={name}
           type={type}
           className="form-control"
@@ -67,12 +61,9 @@ const Input = ({ name, type, placeholder, value, defaultValue, options, ...props
           value={values[name] || []}
           {...props}
         />
-      )}
-
-      {/* ErrorMessage component */}
-      <ErrorMessage name={name}>{msg => <Error type="invalid">{msg}</Error>}</ErrorMessage>
+      )}{' '}
+      {!isRequiredError && <ErrorMessage name={name}>{msg => <Error type="invalid">{msg}</Error>}</ErrorMessage>}
     </>
   );
 };
-
 export default Input;

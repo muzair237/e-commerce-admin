@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
 import { useRouter } from 'next/router';
 import Label from '../components/Atoms/Label';
-import Input from '../components/Atoms/Input';
+import Input from '../components/Atoms/Field';
 import Button from '../components/Atoms/Button';
 import AuthSlider from '../components/Organisms/AuthCarousel';
 import authThunk from '../slices/auth/thunk';
@@ -19,8 +19,8 @@ const Login = () => {
   const initialValues = { email: '', password: '' };
 
   const validationSchema = Yup.object({
-    email: Yup.string().required('Please Enter Email!').email('Please Enter a Valid Email!'),
-    password: Yup.string().required('Please Enter Password!'),
+    email: Yup.string().required().email('Please Enter a Valid Email!'),
+    password: Yup.string().required(),
   });
 
   const onSubmit = async payload => {

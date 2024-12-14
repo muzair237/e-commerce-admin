@@ -59,7 +59,6 @@
     "react-redux": "^9.1.0",
     "react-responsive-carousel": "^3.2.22",
     "react-select": "^5.8.0",
-    "react-tag-input-component": "^2.0.2",
     "reactstrap": "^9.0.1",
     "redux": "^5.0.1",
     "redux-persist": "^6.0.0",
