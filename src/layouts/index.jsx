@@ -29,6 +29,8 @@ const Layout = ({ children }) => {
   const dispatch = useDispatch();
 
   const { isLoggedIn, isSessionExpired } = useSelector(state => state?.Auth);
+  const state = useSelector(state => state?.Auth);
+  console.log('STATE: ', state);
 
   const {
     layoutType,
@@ -135,22 +137,21 @@ const Layout = ({ children }) => {
     }
   }, [token]);
 
-  const [openSessionExpiredModal, setOpenSessionExpiredModal] = useState(isSessionExpired);
-
   return (
     <>
       {loading && <Loader />}
-      {token && isLoggedIn ? (
+      {token ? (
+        // && isLoggedIn
         <>
           <ModalWrapper
-            isOpen={openSessionExpiredModal}
+            isOpen={isSessionExpired}
+            title="Session Expired!"
             headerIcon={<BsExclamationTriangle />}
-            description="Session Expired!"
             size="md"
             backdrop="static"
             closeable={false}
             footerBtnText="Login"
-            footerBtnOnClick={() => setOpenSessionExpiredModal(false)}>
+            footerBtnOnClick={() => dispatch(authThunk.logout({ router }))}>
             <p>Your session has expired due to timeout. Please log in again to continue your session.</p>
           </ModalWrapper>
 

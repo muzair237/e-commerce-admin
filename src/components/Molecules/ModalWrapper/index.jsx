@@ -5,6 +5,7 @@ import { StyledModal } from './ModalWrapper.styles';
 
 const ModalWrapper = ({
   isOpen,
+  title = 'Modal Title',
   headerIcon,
   headerIconSize = 100,
   toggle,
@@ -19,7 +20,7 @@ const ModalWrapper = ({
   <StyledModal isOpen={isOpen} toggle={toggle} centered size={size} backdrop={backdrop} scrollable={scrollable}>
     <ModalHeader toggle={closeable && toggle}>
       <div>
-        <p className="fs-23">Modal Header</p>
+        <p className="fs-23">{title}</p>
         {headerIcon && <div>{React.cloneElement(headerIcon, { size: headerIconSize })}</div>}
       </div>
     </ModalHeader>
@@ -34,9 +35,10 @@ const ModalWrapper = ({
 
 ModalWrapper.propTypes = {
   isOpen: PropTypes.bool.isRequired,
+  title: PropTypes.string.isRequired,
   headerIcon: PropTypes.node,
   headerIconSize: PropTypes.number,
-  toggle: PropTypes.func.isRequired,
+  toggle: PropTypes.func,
   closeable: PropTypes.bool,
   size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl']),
   backdrop: PropTypes.oneOf([true, false, 'static']),

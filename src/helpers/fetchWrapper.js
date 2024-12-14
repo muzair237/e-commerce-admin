@@ -1,11 +1,8 @@
-import { getCookie, clearAllCookies } from './common';
+import { getCookie } from './common';
 
-let trigger = false;
-function handleResponse(response) {
-  if (response.status === 401 && !trigger && getCookie(process.env.NEXT_PUBLIC_ADMIN_TOKEN_COOKIE)) {
-    trigger = true;
-    clearAllCookies();
-    window.location.reload();
+async function handleResponse(response) {
+  if (response.status === 401) {
+    return Promise.reject(new Error('401 Unauthorized'));
   }
 
   return response;

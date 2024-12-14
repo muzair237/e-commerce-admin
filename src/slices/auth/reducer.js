@@ -31,12 +31,19 @@ const authSlice = createSlice({
         state.allowedPages = allowedPages;
       })
 
+      .addCase(authThunk.me.rejected, (state, action) => {
+        if (action?.payload === '401 Unauthorized') state.isSessionExpired = true;
+
+        state.errorMsg = action.payload;
+      })
+
       // LOGOUT
       .addCase(authThunk.logout.fulfilled, state => {
         state.user = {};
         state.isLoggedIn = false;
         state.hasPermission = [];
         state.allowedPages = [];
+        state.isSessionExpired = false;
       });
   },
 });

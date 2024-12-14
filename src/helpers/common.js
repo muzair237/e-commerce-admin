@@ -16,22 +16,28 @@ export const getCookie = name => {
   const ca = typeof document !== 'undefined' && document.cookie.split(';');
   for (let i = 0; i < ca.length; i += 1) {
     let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1, c.length);
+    }
+    if (c.indexOf(nameEQ) === 0) {
+      return c.substring(nameEQ.length, c.length);
+    }
   }
 
   return null;
 };
 
-export const clearAllCookies = () => {
-  const cookies = document.cookie.split(';');
-
-  cookies.forEach(cookie => {
-    const cookieName = cookie.split('=')[0].trim();
-    document.cookie = `${cookieName}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-  });
+export const clearCookie = name => {
+  if (typeof document !== 'undefined') {
+    document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+  }
 
   return true;
+};
+
+export const clearMyBrowserData = () => {
+  clearCookie(process.env.NEXT_PUBLIC_ADMIN_TOKEN_COOKIE);
+  clearCookie(process.env.NEXT_PUBLIC_ADMIN_ALLOWED_PAGES_COOKIE);
 };
 
 export const greetings = () => {
