@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import { Card, Col, Container, Row } from 'reactstrap';
-import { Formik, Form } from 'formik';
-import { useDispatch, useSelector } from 'react-redux';
-import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
-import Label from '../components/Atoms/Label';
-import Input from '../components/Atoms/Field';
+
+import { useForm } from '@/components/Organisms/Form';
+import Field from '@/components/Atoms/Field';
+import Form from '../components/Organisms/Form/Form';
 import Button from '../components/Atoms/Button';
 import AuthSlider from '../components/Organisms/AuthCarousel';
 import authThunk from '../slices/auth/thunk';
@@ -14,17 +14,17 @@ import isLoggedIn from '../components/Common/isLoggedIn';
 
 const Login = () => {
   const router = useRouter();
+  const [form] = useForm();
   const dispatch = useDispatch();
-  const isLoading = useSelector(state => state?.Auth?.isLoading);
-  const initialValues = { email: '', password: '' };
-
-  const validationSchema = Yup.object({
-    email: Yup.string().required().email('Please Enter a Valid Email!'),
-    password: Yup.string().required(),
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async payload => {
-    dispatch(authThunk.login({ payload, router }));
+    try {
+      setIsLoading(true);
+      await dispatch(authThunk.login({ payload, router }));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,37 +48,51 @@ const Login = () => {
                           <p className="text-muted">Sign in to continue to WebNova Admin.</p>
                         </div>
                         <div className="mt-4">
-                          <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-                            <Form>
-                              <div className="mb-3">
-                                <Label htmlFor="email">Email</Label>
-                                <Input name="email" type="text" placeholder="Enter email" />
-                              </div>
-                              <div className="mb-3">
-                                <Label htmlFor="password-input">Password</Label>
-                                <div className="position-relative auth-pass-inputgroup mb-3">
-                                  <Input name="password" type="password" placeholder="Enter password" />
-                                </div>
-                              </div>
-                              <div className="form-check">
-                                <Input name="rememberMe" className="form-check-input" type="checkbox" />
-                                <Label htmlFor="auth-remember-check">Remember me</Label>
-                              </div>
-                              <div className="mt-4 mb-5">
-                                <Button
-                                  color="primary"
-                                  disabled={isLoading}
-                                  loading={isLoading}
-                                  className="w-100"
-                                  type="submit">
-                                  Sign In
-                                </Button>
-                              </div>
-                              <div className="text-center">
-                                <p className="mb-0">&copy; {new Date().getFullYear()} WebNova, Developed by WebNova</p>
-                              </div>
-                            </Form>
-                          </Formik>
+                          <Form form={form} onSubmit={onSubmit}>
+                            <div className="mb-3">
+                              <Form.Item
+                                label="Email"
+                                type="text"
+                                name="email"
+                                placeholder="Email"
+                                rules={[{ required: true }]}>
+                                <Field />
+                              </Form.Item>
+                            </div>
+                            <div className="mb-3">
+                              <Form.Item
+                                label="Password"
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                rules={[{ required: true }]}>
+                                <Field />
+                              </Form.Item>
+                            </div>
+                            <div>
+                              <Form.Item
+                                label="Remember Me"
+                                type="checkbox"
+                                name="rememberMe"
+                                // eslint-disable-next-line no-console
+                                onChange={e => console.log('e: ', e.target.checked)}>
+                                <Field />
+                              </Form.Item>
+                            </div>
+                            <div className="mt-4 mb-5">
+                              <Button
+                                color="primary"
+                                disabled={isLoading}
+                                loading={isLoading}
+                                className="w-100"
+                                type="submit">
+                                Sign In
+                              </Button>
+                            </div>
+                            <div className="text-center">
+                              <p className="mb-0">&copy; {new Date().getFullYear()} WebNova, Developed by WebNova</p>
+                            </div>
+                          </Form>
                         </div>
                       </div>
                     </Col>

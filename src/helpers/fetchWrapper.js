@@ -7,6 +7,7 @@ function handleResponse(response) {
     clearAllCookies();
     window.location.reload();
   }
+
   return response;
 }
 

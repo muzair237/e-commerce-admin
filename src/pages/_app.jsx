@@ -4,16 +4,16 @@ import { Provider } from 'react-redux';
 import { store } from '../slices/store';
 import '../assets/scss/themes.scss';
 import Layout from '../layouts';
-import RefectContextProvider from '../contexts/refetchContext';
+import UtilsContextProvider from '../contexts/utilsContext';
 
 export default function App({ Component, pageProps }) {
   return (
     <Provider store={store}>
-      <RefectContextProvider>
+      <UtilsContextProvider>
         <Layout>
           <Component {...pageProps} />
         </Layout>
-      </RefectContextProvider>
+      </UtilsContextProvider>
     </Provider>
   );
 }

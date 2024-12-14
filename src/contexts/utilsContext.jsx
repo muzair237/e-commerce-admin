@@ -3,7 +3,7 @@ import { createContextHook } from 'use-context-hook';
 
 export const RefetchContext = createContextHook({});
 
-function RefetchContextProvider(props) {
+function UtilsContextProvider(props) {
   // Add 'function' keyword here
   const [fetch, refetch] = useState(false);
 
@@ -18,4 +18,4 @@ function RefetchContextProvider(props) {
   );
 }
 
-export default RefetchContextProvider;
+export default UtilsContextProvider;

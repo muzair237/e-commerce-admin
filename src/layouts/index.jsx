@@ -16,17 +16,20 @@ import {
   changeLeftsidebarViewType,
   changeSidebarImageType,
 } from '@/slices/layouts/thunk';
+import { Toaster } from 'react-hot-toast';
+import { BsExclamationTriangle } from 'react-icons/bs';
 import Loader from '@/components/Molecules/Loader';
+import ModalWrapper from '@/components/Molecules/ModalWrapper';
 import Header from './Header';
 import Footer from './Footer';
 import Sidebar from './Sidebar';
-import { Toaster } from 'react-hot-toast';
 
 const Layout = ({ children }) => {
   const [headerClass, setHeaderClass] = useState('');
   const dispatch = useDispatch();
 
-  const { isLoggedIn } = useSelector(state => state?.Auth);
+  const { isLoggedIn, isSessionExpired } = useSelector(state => state?.Auth);
+
   const {
     layoutType,
     leftSidebarType,
@@ -132,18 +135,34 @@ const Layout = ({ children }) => {
     }
   }, [token]);
 
+  const [openSessionExpiredModal, setOpenSessionExpiredModal] = useState(isSessionExpired);
+
   return (
     <>
       {loading && <Loader />}
       {token && isLoggedIn ? (
-        <div id="layout-wrapper">
-          <Header headerClass={headerClass} layoutModeType={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
-          <Sidebar layoutType={layoutType} />
-          <div className="main-content">
-            {children}
-            <Footer />
+        <>
+          <ModalWrapper
+            isOpen={openSessionExpiredModal}
+            headerIcon={<BsExclamationTriangle />}
+            description="Session Expired!"
+            size="md"
+            backdrop="static"
+            closeable={false}
+            footerBtnText="Login"
+            footerBtnOnClick={() => setOpenSessionExpiredModal(false)}>
+            <p>Your session has expired due to timeout. Please log in again to continue your session.</p>
+          </ModalWrapper>
+
+          <div id="layout-wrapper">
+            <Header headerClass={headerClass} layoutModeType={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
+            <Sidebar layoutType={layoutType} />
+            <div className="main-content">
+              {children}
+              <Footer />
+            </div>
           </div>
-        </div>
+        </>
       ) : (
         <>{children}</>
       )}
