@@ -30,7 +30,7 @@ const Layout = ({ children }) => {
 
   const { isLoggedIn, isSessionExpired } = useSelector(state => state?.Auth);
   const state = useSelector(state => state?.Auth);
-  console.log('STATE: ', state);
+  console.log('state: ', state);
 
   const {
     layoutType,
@@ -109,6 +109,7 @@ const Layout = ({ children }) => {
     leftSidebarImageType,
     dispatch,
   ]);
+
   const onChangeLayoutMode = value => {
     if (changeLayoutMode) {
       dispatch(changeLayoutMode(value));
@@ -140,30 +141,28 @@ const Layout = ({ children }) => {
   return (
     <>
       {loading && <Loader />}
-      {token ? (
-        // && isLoggedIn
-        <>
-          <ModalWrapper
-            isOpen={isSessionExpired}
-            title="Session Expired!"
-            headerIcon={<BsExclamationTriangle />}
-            size="md"
-            backdrop="static"
-            closeable={false}
-            footerBtnText="Login"
-            footerBtnOnClick={() => dispatch(authThunk.logout({ router }))}>
-            <p>Your session has expired due to timeout. Please log in again to continue your session.</p>
-          </ModalWrapper>
-
-          <div id="layout-wrapper">
-            <Header headerClass={headerClass} layoutModeType={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
-            <Sidebar layoutType={layoutType} />
-            <div className="main-content">
-              {children}
-              <Footer />
-            </div>
+      {token && isSessionExpired && (
+        <ModalWrapper
+          isOpen={isSessionExpired}
+          title="Session Expired!"
+          headerIcon={<BsExclamationTriangle />}
+          size="md"
+          backdrop="static"
+          closeable={false}
+          footerBtnText="Logout"
+          footerBtnOnClick={() => dispatch(authThunk.logout({ router }))}>
+          <p>Your session has expired due to timeout. Please log in again to continue your session.</p>
+        </ModalWrapper>
+      )}
+      {token && isLoggedIn ? (
+        <div id="layout-wrapper">
+          <Header headerClass={headerClass} layoutModeType={layoutModeType} onChangeLayoutMode={onChangeLayoutMode} />
+          <Sidebar layoutType={layoutType} />
+          <div className="main-content">
+            {children}
+            <Footer />
           </div>
-        </>
+        </div>
       ) : (
         <>{children}</>
       )}

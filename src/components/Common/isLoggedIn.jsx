@@ -6,7 +6,8 @@ const isLoggedIn = Component => props => {
   const router = useRouter();
   const [isLogged, setIsLogged] = useState(false);
   const token = getCookie(process.env.NEXT_PUBLIC_ADMIN_TOKEN_COOKIE);
-  const allowedPages = JSON.parse(getCookie(process.env.NEXT_PUBLIC_ADMIN_ALLOWED_PAGES_COOKIE));
+  const allowedPages = JSON.parse(getCookie(process.env.NEXT_PUBLIC_ADMIN_ALLOWED_PAGES_COOKIE)) || [];
+
   useEffect(() => {
     if (token && allowedPages) {
       router.replace(allowedPages[0]);
@@ -14,6 +15,7 @@ const isLoggedIn = Component => props => {
       setIsLogged(true);
     }
   }, []);
+
   return isLogged ? <Component {...props} /> : null;
 };
 

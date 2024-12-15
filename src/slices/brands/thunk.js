@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import { handleThunkError } from '@/helpers/common';
 import { Fetch } from '../../helpers/fetchWrapper';
-import { Toast } from '../../components/Molecules/Toast';
 import { GET_ALL_BRANDS } from '../../helpers/url_helper';
 
 const brandsThunk = {
@@ -18,12 +18,9 @@ const brandsThunk = {
       }
       const { message } = await res.json();
       throw new Error(message ?? 'Something Went Wrong');
-    } catch ({ message }) {
-      Toast({
-        type: 'error',
-        message,
-      });
-      throw message;
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
     }
   }),
 };

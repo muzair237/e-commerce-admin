@@ -1,3 +1,5 @@
+import { Toast } from '@/components/Molecules/Toast';
+
 export const setCookie = (name, value, domain, days) => {
   let expires = '';
   if (days) {
@@ -16,12 +18,8 @@ export const getCookie = name => {
   const ca = typeof document !== 'undefined' && document.cookie.split(';');
   for (let i = 0; i < ca.length; i += 1) {
     let c = ca[i];
-    while (c.charAt(0) === ' ') {
-      c = c.substring(1, c.length);
-    }
-    if (c.indexOf(nameEQ) === 0) {
-      return c.substring(nameEQ.length, c.length);
-    }
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
   }
 
   return null;
@@ -50,4 +48,13 @@ export const greetings = () => {
     : currentHour >= 18 && currentHour < 21
     ? 'Good Evening'
     : 'Good Night';
+};
+
+export const handleThunkError = ({ message }) => {
+  if (!['401 Unauthorized', 'jwt expired'].includes(message)) {
+    Toast({
+      type: 'error',
+      message,
+    });
+  }
 };

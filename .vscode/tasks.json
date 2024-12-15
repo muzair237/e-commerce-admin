@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run E-Commerce Admin",
+      "type": "npm",
+      "script": "dev",
+      "detail": "Starts the e-commerce-admin application",
+      "problemMatcher": []
+    }
+  ]
+}

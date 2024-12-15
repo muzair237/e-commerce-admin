@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
-import get from "rc-util/lib/utils/get";
-import set from "rc-util/lib/utils/set";
-import { toArray } from "./typeUtil";
+import get from 'rc-util/lib/utils/get';
+import set from 'rc-util/lib/utils/set';
+import { toArray } from './typeUtil';
 
 export function getNamePath(path) {
   return toArray(path);
@@ -32,7 +32,7 @@ export function containsNamePath(namePathList, namePath) {
 }
 
 function isObject(obj) {
-  return typeof obj === "object" && obj !== null && Object.getPrototypeOf(obj) === Object.prototype;
+  return typeof obj === 'object' && obj !== null && Object.getPrototypeOf(obj) === Object.prototype;
 }
 
 function internalSetValues(store, values) {
@@ -72,7 +72,7 @@ export function isSimilar(source, target) {
     return false;
   }
 
-  if (!source || !target || typeof source !== "object" || typeof target !== "object") {
+  if (!source || !target || typeof source !== 'object' || typeof target !== 'object') {
     return false;
   }
 
@@ -84,7 +84,7 @@ export function isSimilar(source, target) {
     const sourceValue = source[key];
     const targetValue = target[key];
 
-    if (typeof sourceValue === "function" && typeof targetValue === "function") {
+    if (typeof sourceValue === 'function' && typeof targetValue === 'function') {
       return true;
     }
     return sourceValue === targetValue;
@@ -124,7 +124,7 @@ export function move(array, moveIndex, toIndex) {
       ...array.slice(0, toIndex),
       item,
       ...array.slice(toIndex, moveIndex),
-      ...array.slice(moveIndex + 1, length)
+      ...array.slice(moveIndex + 1, length),
     ];
   }
   if (diff < 0) {
@@ -133,7 +133,7 @@ export function move(array, moveIndex, toIndex) {
       ...array.slice(0, moveIndex),
       ...array.slice(moveIndex + 1, toIndex + 1),
       item,
-      ...array.slice(toIndex + 1, length)
+      ...array.slice(toIndex + 1, length),
     ];
   }
   return array;

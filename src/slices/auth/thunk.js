@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Toast } from '../../components/Molecules/Toast';
-import { setCookie, clearMyBrowserData } from '../../helpers/common';
+import { setCookie, clearMyBrowserData, handleThunkError } from '../../helpers/common';
 import { Fetch } from '../../helpers/fetchWrapper';
 import { LOGIN, LOGOUT, ME } from '../../helpers/url_helper';
 
@@ -32,7 +32,7 @@ const authThunk = {
     }
   }),
 
-  me: createAsyncThunk('auth/me', async (_, { rejectWithValue }) => {
+  me: createAsyncThunk('auth/me', async () => {
     try {
       const res = await Fetch.get(`${authThunk.url}/${ME}`);
       if (res.status >= 200 && res.status < 300) {
@@ -47,17 +47,14 @@ const authThunk = {
       }
       const { message } = await res.json();
       throw new Error(message ?? 'Something Went Wrong');
-    } catch ({ message }) {
-      Toast({
-        type: 'error',
-        message,
-      });
+    } catch (error) {
+      handleThunkError(error);
 
-      return rejectWithValue(message);
+      throw error?.message;
     }
   }),
 
-  logout: createAsyncThunk('auth/logoutUser', async ({ router }) => {
+  logout: createAsyncThunk('logout/logoutUser', async ({ router }) => {
     try {
       await Fetch.get(`${authThunk.url}/${LOGOUT}`);
     } finally {
