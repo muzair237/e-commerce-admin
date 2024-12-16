@@ -7,7 +7,7 @@ import { RxCrossCircled } from 'react-icons/rx';
 import { format } from 'date-fns';
 import Button from '../Atoms/Button';
 
-const PermissionGlobalFilter = ({ setFilters }) => {
+const GeneralGlobalFilter = ({ setFilters }) => {
   const [searchText, setSearchText] = useState('');
   const flatpickrRef = useRef(null);
   const debounceRef = useRef(0);
@@ -21,12 +21,6 @@ const PermissionGlobalFilter = ({ setFilters }) => {
     { label: 'Earliest', value: 'earliest' },
   ];
 
-  const typeOptions = [
-    { label: 'All', value: 'all' },
-    { label: 'ADMIN', value: 'ADMIN' },
-    { label: 'USER', value: 'USER' },
-  ];
-
   const onSearchCallText = useMemo(
     () =>
       debounce(value => {
@@ -34,6 +28,7 @@ const PermissionGlobalFilter = ({ setFilters }) => {
         const LocalRef = debounceRef.current;
         setTimeout(() => {
           if (LocalRef === debounceRef.current) {
+            console.log('value: ', value);
             setFilters(prev => ({
               ...prev,
               searchText: value,
@@ -50,17 +45,6 @@ const PermissionGlobalFilter = ({ setFilters }) => {
       setFilters(prev => ({
         ...prev,
         sort: filter.value,
-      }));
-    },
-    [],
-  );
-
-  const onChangeTypeFilter = useMemo(
-    () => filter => {
-      setTypeFilter(filter);
-      setFilters(prev => ({
-        ...prev,
-        type: filter.value,
       }));
     },
     [],
@@ -138,18 +122,6 @@ const PermissionGlobalFilter = ({ setFilters }) => {
                 value={permissionFilter}
                 onChange={onChangeFilter}
                 options={options}
-                name="choices-single-default"
-                id="idStatus"
-              />
-            </div>
-          </Col>
-          <Col sm={4}>
-            <div>
-              <Select
-                // styles={customStyles}
-                value={typeFilter}
-                onChange={onChangeTypeFilter}
-                options={typeOptions}
                 name="choices-single-default"
                 id="idStatus"
               />
@@ -490,4 +462,4 @@ const AdminGlobalFilter = ({ setFilters, uniqueRoles, ignoreSorting }) => {
   );
 };
 
-export { PermissionGlobalFilter, RoleGlobalFilter, AdminGlobalFilter };
+export { GeneralGlobalFilter, RoleGlobalFilter, AdminGlobalFilter };

@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ModalHeader, ModalBody, ModalFooter, Button } from 'reactstrap';
-import { StyledModal } from './ModalWrapper.styles';
+import { ModalBody, ModalFooter } from 'reactstrap';
+
+import { IoCloseOutline } from 'react-icons/io5';
+import { StyledModal, ModalHeader } from './ModalWrapper.styles';
+import Button from '@/components/Atoms/Button';
 
 const ModalWrapper = ({
   isOpen,
@@ -10,26 +13,38 @@ const ModalWrapper = ({
   headerIconSize = 100,
   toggle,
   closeable = true,
+  isContentCentered = true,
   size = 'md',
-  backdrop,
+  backdrop = true,
   scrollable = false,
   children,
-  footerBtnText = 'Go Back',
+  footerBtnText,
   footerBtnOnClick,
 }) => (
-  <StyledModal isOpen={isOpen} toggle={toggle} centered size={size} backdrop={backdrop} scrollable={scrollable}>
-    <ModalHeader toggle={closeable && toggle}>
-      <div>
-        <p className="fs-23">{title}</p>
-        {headerIcon && <div>{React.cloneElement(headerIcon, { size: headerIconSize })}</div>}
-      </div>
+  <StyledModal
+    $isContentCentered={isContentCentered}
+    $shouldApplyBottomPadding={!footerBtnText}
+    isOpen={isOpen}
+    centered
+    size={size}
+    backdrop={backdrop}
+    scrollable={scrollable}>
+    <ModalHeader $closeable={closeable}>
+      <span className="title">{title}</span>
+      {closeable && <IoCloseOutline onClick={toggle} className="close-icon" size={30} />}
     </ModalHeader>
-    <ModalBody>{children}</ModalBody>
-    <ModalFooter>
-      <Button color="primary" style={{ width: '100%' }} onClick={footerBtnOnClick ?? toggle}>
-        {footerBtnText}
-      </Button>
-    </ModalFooter>
+    <ModalBody>
+      <div className="mb-4">{headerIcon && React.cloneElement(headerIcon, { size: headerIconSize })}</div>
+      {children}
+    </ModalBody>
+
+    {footerBtnText && (
+      <ModalFooter>
+        <Button color="primary" className="w-100" onClick={footerBtnOnClick ?? toggle}>
+          {footerBtnText}
+        </Button>
+      </ModalFooter>
+    )}
   </StyledModal>
 );
 
@@ -40,6 +55,7 @@ ModalWrapper.propTypes = {
   headerIconSize: PropTypes.number,
   toggle: PropTypes.func,
   closeable: PropTypes.bool,
+  isContentCentered: PropTypes.bool,
   size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl']),
   backdrop: PropTypes.oneOf([true, false, 'static']),
   scrollable: PropTypes.bool,

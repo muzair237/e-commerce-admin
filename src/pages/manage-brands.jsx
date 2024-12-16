@@ -2,16 +2,22 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Head from 'next/head';
 import { Col, Container, Row, Card, CardHeader, UncontrolledTooltip } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { MdRemoveRedEye, MdOutlineModeEdit, MdDeleteOutline } from 'react-icons/md';
 import brandsThunk from '@/slices/brands/thunk';
 import { manageBrandsColumns } from '@/common/columns';
 import { format } from 'date-fns';
 import BreadCrumb from '@/components/Common/BreadCrumb';
 import TableContainer from '@/components/Common/TableContainer';
+import ModalWrapper from '@/components/Molecules/ModalWrapper';
+import ImageComponent from '@/components/Atoms/Image';
+import LogoModal from '@/components/Organisms/LogoModal';
 import withAuthProtection from '../components/Common/withAuthProtection';
 
 const ManageBrands = () => {
   const dispatch = useDispatch();
-  const hasPermission = useSelector(state => state?.Auth?.hasPermission);
+  const [currentLogo, setCurrentLogo] = useState({});
+  const [viewLogoModal, setViewLogoModal] = useState(false);
+  const [editLogoModal, setEditLogoModal] = useState(false);
   const brands = useSelector(state => state?.Brand?.brands || {});
   const isLoading = useSelector(state => state?.Permission?.isLoading);
   const [filters, setFilters] = useState({
@@ -22,28 +28,77 @@ const ManageBrands = () => {
     endDate: '',
     searchText: '',
     sort: 'latest',
-    type: '',
   });
 
   const setSearchQueryCallback = useCallback(newSearchQuery => {
     setFilters(newSearchQuery);
   }, []);
 
-  useEffect(() => {
-    dispatch(brandsThunk.getAllBrands(filters));
-  }, [filters]);
+  const actionBtns = _ => (
+    <div className="d-flex gap-3">
+      <div className="viewLogo">
+        <MdRemoveRedEye
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setCurrentLogo(_);
+            setViewLogoModal(true);
+          }}
+          color="#007BFF"
+          size={19}
+          id="viewLogo"
+        />
+        <UncontrolledTooltip placement="top" target="viewLogo">
+          View Logo
+        </UncontrolledTooltip>
+      </div>
+      <div className="edit">
+        <MdOutlineModeEdit
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setCurrentLogo(_);
+            setEditLogoModal(true);
+          }}
+          color="green"
+          size={19}
+          id="edit"
+        />
+        <UncontrolledTooltip placement="top" target="edit">
+          Edit
+        </UncontrolledTooltip>
+      </div>
+      <div className="remove">
+        <MdDeleteOutline
+          style={{ cursor: 'pointer' }}
+          id="delete"
+          size={19}
+          color="red"
+          // onClick={() => {
+          //   setPermissionToDelete(_?._id);
+          //   setDeleteModal(true);
+          // }}
+        />
+        <UncontrolledTooltip placement="top" target="delete">
+          Delete
+        </UncontrolledTooltip>
+      </div>
+    </div>
+  );
 
   const { brands_rows, totalCount } = useMemo(
     () => ({
       brands_rows: brands?.items?.map(_ => [
         format(new Date(_?.created_at), 'yyyy-MM-dd') || '------------',
         _?.name || '------------',
-        // actionBtns(_),
+        actionBtns(_),
       ]),
       totalCount: brands?.totalItems,
     }),
     [brands],
   );
+
+  useEffect(() => {
+    dispatch(brandsThunk.getAllBrands(filters));
+  }, [filters]);
 
   return (
     <>
@@ -51,6 +106,25 @@ const ManageBrands = () => {
         <title>WebNova | MANAGE BRANDS</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
+      {/* View Logo Modal */}
+      <ModalWrapper
+        isOpen={viewLogoModal}
+        toggle={() => setViewLogoModal(false)}
+        title={currentLogo?.name?.toUpperCase()}
+        size="md">
+        <ImageComponent src={currentLogo?.logo} width={170} height={170} alt={currentLogo?.name} />
+      </ModalWrapper>
+
+      {/* Edit Logo Modal */}
+      <ModalWrapper
+        isOpen={editLogoModal}
+        toggle={() => setEditLogoModal(false)}
+        title={currentLogo?.name?.toUpperCase()}
+        size="md"
+        backdrop="static"
+        isContentCentered={false}>
+        <LogoModal />
+      </ModalWrapper>
       <div className="page-content">
         <Container fluid>
           <BreadCrumb title="Manage Brands" />
@@ -89,7 +163,7 @@ const ManageBrands = () => {
                       data={brands_rows || []}
                       isGlobalFilter
                       isLoading={isLoading}
-                      isPermissionFilter
+                      isGeneralFilter
                       currentPage={filters?.page}
                       totalCount={totalCount}
                       itemsPerPage={filters?.itemsPerPage}

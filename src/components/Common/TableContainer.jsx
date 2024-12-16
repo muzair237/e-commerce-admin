@@ -10,7 +10,7 @@ const TableContainer = ({
   data,
   isGlobalFilter,
   isLoading,
-  isPermissionFilter,
+  isGeneralFilter,
   isRoleFilter,
   isAdminFilter,
   currentPage,
@@ -21,9 +21,7 @@ const TableContainer = ({
 }) => (
   <>
     <Row className="mb-3">
-      {isGlobalFilter && isPermissionFilter && (
-        <GlobalFilter isPermissionFilter={isPermissionFilter} setFilters={setFilters} />
-      )}
+      {isGlobalFilter && isGeneralFilter && <GlobalFilter isGeneralFilter={isGeneralFilter} setFilters={setFilters} />}
       {isGlobalFilter && isRoleFilter && <GlobalFilter isRoleFilter={isRoleFilter} setFilters={setFilters} />}
       {isGlobalFilter && isAdminFilter && (
         <GlobalFilter isAdminFilter={isAdminFilter} setFilters={setFilters} {...props} />

@@ -29,8 +29,6 @@ const Layout = ({ children }) => {
   const dispatch = useDispatch();
 
   const { isLoggedIn, isSessionExpired } = useSelector(state => state?.Auth);
-  const state = useSelector(state => state?.Auth);
-  console.log('state: ', state);
 
   const {
     layoutType,

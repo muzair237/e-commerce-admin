@@ -6,6 +6,7 @@ import TogglePasswordIcon from '../TogglePasswordIcon';
 import { StyledInput, Error, InputWrapper } from './Field.styles';
 import Label from '../Label';
 import InputIcon from '../InputIcon';
+import UploadFile from '@/components/Molecules/UploadFile';
 
 const Field = forwardRef(
   ({ label, name, type, placeholder, disabled, options, prefix, suffix, rules, invalid, error, ...props }, ref) => {
@@ -71,6 +72,8 @@ const Field = forwardRef(
               placeholder={placeholder}
               {...props}
             />
+          ) : type === 'file' ? (
+            <UploadFile {...props} />
           ) : (
             <StyledInput
               ref={ref}

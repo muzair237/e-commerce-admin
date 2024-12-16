@@ -1,7 +1,7 @@
 import { getCookie } from './common';
 
 async function handleResponse(response) {
-  if (response.status === 401) {
+  if (response.status === 401 && !response.url.endsWith('login')) {
     return Promise.reject(new Error('401 Unauthorized'));
   }
 

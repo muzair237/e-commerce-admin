@@ -1,5 +1,5 @@
 // MANAGE BRANDS COLUMN(S)
-export const manageBrandsColumns = ['Created At', 'Name'];
+export const manageBrandsColumns = ['Created At', 'Name', 'Actions'];
 
 // PERMISSION COLUMN(S)
 export const permissionColumns = ['Created At', 'Can', 'Description', 'Group', 'Actions'];
