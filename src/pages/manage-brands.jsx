@@ -12,6 +12,7 @@ import ModalWrapper from '@/components/Molecules/ModalWrapper';
 import ImageComponent from '@/components/Atoms/Image';
 import LogoModal from '@/components/Organisms/LogoModal';
 import withAuthProtection from '../components/Common/withAuthProtection';
+import Anchor from '@/components/Molecules/Anchor';
 
 const ManageBrands = () => {
   const dispatch = useDispatch();
@@ -37,16 +38,18 @@ const ManageBrands = () => {
   const actionBtns = _ => (
     <div className="d-flex gap-3">
       <div className="viewLogo">
-        <MdRemoveRedEye
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentLogo(_);
-            setViewLogoModal(true);
-          }}
-          color="#007BFF"
-          size={19}
-          id="viewLogo"
-        />
+        <Anchor href={_?.logo} target="_blank">
+          <MdRemoveRedEye
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentLogo(_);
+              setViewLogoModal(true);
+            }}
+            color="#007BFF"
+            size={19}
+            id="viewLogo"
+          />
+        </Anchor>
         <UncontrolledTooltip placement="top" target="viewLogo">
           View Logo
         </UncontrolledTooltip>
@@ -96,6 +99,10 @@ const ManageBrands = () => {
     [brands],
   );
 
+  const handleBrand = payload => {
+    console.log('payload', payload);
+  };
+
   useEffect(() => {
     dispatch(brandsThunk.getAllBrands(filters));
   }, [filters]);
@@ -106,14 +113,6 @@ const ManageBrands = () => {
         <title>WebNova | MANAGE BRANDS</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      {/* View Logo Modal */}
-      <ModalWrapper
-        isOpen={viewLogoModal}
-        toggle={() => setViewLogoModal(false)}
-        title={currentLogo?.name?.toUpperCase()}
-        size="md">
-        <ImageComponent src={currentLogo?.logo} width={170} height={170} alt={currentLogo?.name} />
-      </ModalWrapper>
 
       {/* Edit Logo Modal */}
       <ModalWrapper
@@ -123,8 +122,15 @@ const ManageBrands = () => {
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <LogoModal />
+        <LogoModal
+          currentLogo={{
+            name: currentLogo.name,
+            logo: currentLogo.logo,
+          }}
+          handleClick={handleBrand}
+        />
       </ModalWrapper>
+
       <div className="page-content">
         <Container fluid>
           <BreadCrumb title="Manage Brands" />

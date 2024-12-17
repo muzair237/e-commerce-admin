@@ -1,13 +1,21 @@
-import React from 'react';
-import propTypes from 'prop-types';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Row, Col } from 'reactstrap';
 import { useForm } from '@/components/Organisms/Form';
 import Field from '@/components/Atoms/Field';
 import Form from '@/components/Organisms/Form/Form';
 import Button from '@/components/Atoms/Button';
 
-const LogoModal = ({ handleClick }) => {
+const LogoModal = ({ currentLogo, handleClick }) => {
+  const { name, logo } = currentLogo;
   const [form] = useForm();
+
+  useEffect(() => {
+    form.setFieldsValue({
+      name,
+      logo,
+    });
+  }, []);
 
   return (
     <Form form={form} onSubmit={handleClick}>
@@ -20,12 +28,12 @@ const LogoModal = ({ handleClick }) => {
           </div>
         </Col>
         <div className="mb-3">
-          <Form.Item label="Upload Logo" type="file" name="logo" rules={[{ required: true }]}>
+          <Form.Item label="Upload Logo" type="file" name="logo" displayFile={logo} rules={[{ required: true }]}>
             <Field />
           </Form.Item>
         </div>
         <div className="mb-3">
-          <Button color="primary" className="w-100" onClick={handleClick}>
+          <Button color="primary" type="submit" className="w-100">
             Submit
           </Button>
         </div>
@@ -35,7 +43,11 @@ const LogoModal = ({ handleClick }) => {
 };
 
 LogoModal.propTypes = {
-  handleClick: propTypes.func.isRequired,
+  handleClick: PropTypes.func.isRequired,
+  currentLogo: PropTypes.shape({
+    name: PropTypes.string,
+    logo: PropTypes.string,
+  }),
 };
 
 export default LogoModal;

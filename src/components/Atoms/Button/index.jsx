@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyledButton } from './Button.styles';
 
-const Button = ({ onClick, color, className, type, id, loading, disabled, children }) => (
+const Button = ({ onClick, color, className, type, id, loading, disabled, children, ...props }) => (
   <StyledButton
     onClick={onClick}
     color={color}
@@ -9,7 +9,8 @@ const Button = ({ onClick, color, className, type, id, loading, disabled, childr
     disabled={disabled}
     className={className}
     type={type}
-    id={id}>
+    id={id}
+    {...props}>
     {loading ? <span className="loader" /> : children}
   </StyledButton>
 );

@@ -2,11 +2,11 @@ import React, { useState, forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import { Input } from 'reactstrap';
+import UploadFile from '@/components/Molecules/UploadFile';
 import TogglePasswordIcon from '../TogglePasswordIcon';
 import { StyledInput, Error, InputWrapper } from './Field.styles';
 import Label from '../Label';
 import InputIcon from '../InputIcon';
-import UploadFile from '@/components/Molecules/UploadFile';
 
 const Field = forwardRef(
   ({ label, name, type, placeholder, disabled, options, prefix, suffix, rules, invalid, error, ...props }, ref) => {
@@ -73,7 +73,7 @@ const Field = forwardRef(
               {...props}
             />
           ) : type === 'file' ? (
-            <UploadFile {...props} />
+            <UploadFile isInvalid={isError} {...props} />
           ) : (
             <StyledInput
               ref={ref}
