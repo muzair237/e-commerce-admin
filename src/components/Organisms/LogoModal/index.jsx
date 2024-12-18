@@ -6,15 +6,17 @@ import Field from '@/components/Atoms/Field';
 import Form from '@/components/Organisms/Form/Form';
 import Button from '@/components/Atoms/Button';
 
-const LogoModal = ({ currentLogo, handleClick }) => {
+const LogoModal = ({ currentLogo, isLoading, handleClick }) => {
   const { name, logo } = currentLogo;
   const [form] = useForm();
 
   useEffect(() => {
-    form.setFieldsValue({
-      name,
-      logo,
-    });
+    if (currentLogo && Object.keys(currentLogo).length > 0) {
+      form.setFieldsValue({
+        name,
+        logo,
+      });
+    }
   }, []);
 
   return (
@@ -33,7 +35,7 @@ const LogoModal = ({ currentLogo, handleClick }) => {
           </Form.Item>
         </div>
         <div className="mb-3">
-          <Button color="primary" type="submit" className="w-100">
+          <Button loading={isLoading} color="primary" type="submit" className="w-100">
             Submit
           </Button>
         </div>
@@ -44,6 +46,7 @@ const LogoModal = ({ currentLogo, handleClick }) => {
 
 LogoModal.propTypes = {
   handleClick: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
   currentLogo: PropTypes.shape({
     name: PropTypes.string,
     logo: PropTypes.string,

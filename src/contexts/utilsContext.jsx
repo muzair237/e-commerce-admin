@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { createContextHook } from 'use-context-hook';
 
-export const RefetchContext = createContextHook({});
+export const UtilsContext = createContextHook({});
 
-function UtilsContextProvider(props) {
-  // Add 'function' keyword here
-  const [fetch, refetch] = useState(false);
+function UtilsContextProvider({ children }) {
+  const [refetch, setRefetch] = useState(false);
 
-  return (
-    <RefetchContext.Provider
-      value={{
-        fetch,
-        refetch,
-      }}>
-      {props.children}
-    </RefetchContext.Provider>
-  );
+  // Use useMemo to stabilize the context value
+  const contextValue = useMemo(() => ({ refetch, setRefetch }), [refetch, setRefetch]);
+
+  return <UtilsContext.Provider value={contextValue}>{children}</UtilsContext.Provider>;
 }
+
+UtilsContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default UtilsContextProvider;

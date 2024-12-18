@@ -12,6 +12,7 @@ export const StyledButton = styled(Button)`
     border-right-color: var(--white);
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
+    cursor: ${({ loading }) => (loading ? 'not-allowed' : 'pointer')};
   }
 
   @keyframes rotation {

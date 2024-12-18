@@ -75,3 +75,33 @@ export const formatBytes = (bytes, decimals = 2) => {
 
   return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 };
+
+export const handleApiCall = async (dispatch, action, params) => {
+  try {
+    const response = await dispatch(action(params));
+
+    return response?.meta?.requestStatus === 'fulfilled';
+  } catch (error) {
+    console.error('API call failed:', error);
+
+    return false;
+  }
+};
+
+export const convertToFormData = obj => {
+  const formData = new FormData();
+
+  Object.keys(obj).forEach(key => {
+    const value = obj[key];
+
+    if (value instanceof File || value instanceof Blob) {
+      formData.append(key, value);
+    } else if (value && (typeof value === 'object' || Array.isArray(value))) {
+      formData.append(key, JSON.stringify(value));
+    } else {
+      formData.append(key, value);
+    }
+  });
+
+  return formData;
+};

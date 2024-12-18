@@ -6,21 +6,26 @@ import { MdRemoveRedEye, MdOutlineModeEdit, MdDeleteOutline } from 'react-icons/
 import brandsThunk from '@/slices/brands/thunk';
 import { manageBrandsColumns } from '@/common/columns';
 import { format } from 'date-fns';
+import { useContextHook } from 'use-context-hook';
+import { UtilsContext } from '@/contexts/utilsContext';
+import { handleApiCall, convertToFormData } from '@/helpers/common';
 import BreadCrumb from '@/components/Common/BreadCrumb';
 import TableContainer from '@/components/Common/TableContainer';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
-import ImageComponent from '@/components/Atoms/Image';
 import LogoModal from '@/components/Organisms/LogoModal';
-import withAuthProtection from '../components/Common/withAuthProtection';
 import Anchor from '@/components/Molecules/Anchor';
+import withAuthProtection from '../components/Common/withAuthProtection';
+import Button from '@/components/Atoms/Button';
 
 const ManageBrands = () => {
   const dispatch = useDispatch();
   const [currentLogo, setCurrentLogo] = useState({});
-  const [viewLogoModal, setViewLogoModal] = useState(false);
-  const [editLogoModal, setEditLogoModal] = useState(false);
-  const brands = useSelector(state => state?.Brand?.brands || {});
-  const isLoading = useSelector(state => state?.Permission?.isLoading);
+  const [logoModal, setLogoModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const brands = useSelector(state => state?.Brand?.brands) || {};
+  const { tableLoading } = useSelector(state => state?.Brand) || false;
+  const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
+
   const [filters, setFilters] = useState({
     page: 1,
     itemsPerPage: 10,
@@ -35,16 +40,39 @@ const ManageBrands = () => {
     setFilters(newSearchQuery);
   }, []);
 
+  const handleBrand = async payload => {
+    try {
+      const { name, logo } = payload;
+
+      setIsLoading(true);
+
+      let success;
+      if (Object?.keys(currentLogo)?.length > 0) {
+        success = await handleApiCall(dispatch, brandsThunk.updateBrand, {
+          id: currentLogo?.id,
+          payload: convertToFormData({
+            name,
+            ...(logo instanceof File && { logo }),
+          }),
+        });
+      }
+
+      if (success) {
+        setLogoModal(false);
+        setRefetch(prev => !prev);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const actionBtns = _ => (
     <div className="d-flex gap-3">
       <div className="viewLogo">
         <Anchor href={_?.logo} target="_blank">
           <MdRemoveRedEye
             style={{ cursor: 'pointer' }}
-            onClick={() => {
-              setCurrentLogo(_);
-              setViewLogoModal(true);
-            }}
+            onClick={() => setCurrentLogo(_)}
             color="#007BFF"
             size={19}
             id="viewLogo"
@@ -58,8 +86,8 @@ const ManageBrands = () => {
         <MdOutlineModeEdit
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            setCurrentLogo(_);
-            setEditLogoModal(true);
+            setCurrentLogo({ name: _?.name, logo: _?.logo });
+            setLogoModal(true);
           }}
           color="green"
           size={19}
@@ -67,21 +95,6 @@ const ManageBrands = () => {
         />
         <UncontrolledTooltip placement="top" target="edit">
           Edit
-        </UncontrolledTooltip>
-      </div>
-      <div className="remove">
-        <MdDeleteOutline
-          style={{ cursor: 'pointer' }}
-          id="delete"
-          size={19}
-          color="red"
-          // onClick={() => {
-          //   setPermissionToDelete(_?._id);
-          //   setDeleteModal(true);
-          // }}
-        />
-        <UncontrolledTooltip placement="top" target="delete">
-          Delete
         </UncontrolledTooltip>
       </div>
     </div>
@@ -99,13 +112,9 @@ const ManageBrands = () => {
     [brands],
   );
 
-  const handleBrand = payload => {
-    console.log('payload', payload);
-  };
-
   useEffect(() => {
     dispatch(brandsThunk.getAllBrands(filters));
-  }, [filters]);
+  }, [filters, refetch]);
 
   return (
     <>
@@ -114,21 +123,15 @@ const ManageBrands = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
 
-      {/* Edit Logo Modal */}
+      {/* Logo Modal */}
       <ModalWrapper
-        isOpen={editLogoModal}
-        toggle={() => setEditLogoModal(false)}
-        title={currentLogo?.name?.toUpperCase()}
+        isOpen={logoModal}
+        toggle={() => setLogoModal(false)}
+        title={currentLogo?.name?.toUpperCase() || 'Create Brand'}
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <LogoModal
-          currentLogo={{
-            name: currentLogo.name,
-            logo: currentLogo.logo,
-          }}
-          handleClick={handleBrand}
-        />
+        <LogoModal currentLogo isLoading={isLoading} handleClick={handleBrand} />
       </ModalWrapper>
 
       <div className="page-content">
@@ -144,22 +147,20 @@ const ManageBrands = () => {
                         <h5 className="card-title mb-0 fw-semibold">Manage Brands</h5>
                       </div>
                     </div>
-                    {/* {hasPermission.includes('brands.create') && (
-                      <div className="col-sm-auto">
-                        <div>
-                          <Button
-                            onClick={() => {
-                              setPermission();
-                              setPermissionModal(true);
-                            }}
-                            type="button"
-                            className="btn btn-success add-btn"
-                            id="create-btn">
-                            <i className="ri-add-line align-bottom me-1" /> Create Permission
-                          </Button>
-                        </div>
+                    <div className="col-sm-auto">
+                      <div>
+                        <Button
+                          onClick={() => {
+                            setCurrentLogo({});
+                            setLogoModal(true);
+                          }}
+                          type="button"
+                          className="btn btn-success add-btn"
+                          id="create-btn">
+                          <i className="ri-add-line align-bottom me-1" /> Create Brand
+                        </Button>
                       </div>
-                    )} */}
+                    </div>
                   </Row>
                 </CardHeader>
                 <div className="card-body pt-0">
@@ -168,7 +169,7 @@ const ManageBrands = () => {
                       columns={manageBrandsColumns}
                       data={brands_rows || []}
                       isGlobalFilter
-                      isLoading={isLoading}
+                      isLoading={tableLoading}
                       isGeneralFilter
                       currentPage={filters?.page}
                       totalCount={totalCount}
