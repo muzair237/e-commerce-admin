@@ -6,8 +6,8 @@ import { useContextHook } from 'use-context-hook';
 import { MdRemoveRedEye, MdOutlineModeEdit } from 'react-icons/md';
 import { format } from 'date-fns';
 
-import brandsThunk from '@/slices/brands/thunk';
-import { manageBrandsColumns } from '@/common/columns';
+import productsThunk from '@/slices/products/thunk';
+import { manageProductsColumns } from '@/common/columns';
 import { UtilsContext } from '@/contexts/utilsContext';
 import { handleApiCall, convertToFormData } from '@/helpers/common';
 import BreadCrumb from '@/components/Common/BreadCrumb';
@@ -18,12 +18,12 @@ import Anchor from '@/components/Molecules/Anchor';
 import Button from '@/components/Atoms/Button';
 import withAuthProtection from '@/components/Common/withAuthProtection';
 
-const ManageBrands = () => {
+const ManageProducts = () => {
   const dispatch = useDispatch();
   const [currentLogo, setCurrentLogo] = useState({});
   const [logoModal, setLogoModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { brands } = useSelector(state => state?.Brand) || {};
+  const { products } = useSelector(state => state?.Product) || {};
   const { tableLoading } = useSelector(state => state?.Brand) || false;
   const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
 
@@ -41,7 +41,7 @@ const ManageBrands = () => {
     setFilters(newSearchQuery);
   }, []);
 
-  const handleBrand = async payload => {
+  const handleProduct = async payload => {
     try {
       const { name, logo } = payload;
 
@@ -49,7 +49,7 @@ const ManageBrands = () => {
 
       let success;
       if (Object?.keys(currentLogo)?.length > 0) {
-        success = await handleApiCall(dispatch, brandsThunk.updateBrand, {
+        success = await handleApiCall(dispatch, productsThunk.updateBrand, {
           id: currentLogo?.id,
           payload: convertToFormData({
             name,
@@ -57,7 +57,7 @@ const ManageBrands = () => {
           }),
         });
       } else {
-        success = await handleApiCall(dispatch, brandsThunk.createBrand, {
+        success = await handleApiCall(dispatch, productsThunk.createBrand, {
           payload: convertToFormData({
             name,
             logo,
@@ -110,24 +110,27 @@ const ManageBrands = () => {
 
   const { brands_rows, totalCount } = useMemo(
     () => ({
-      brands_rows: brands?.items?.map(_ => [
+      brands_rows: products?.items?.map(_ => [
         format(new Date(_?.created_at), 'yyyy-MM-dd') || '------------',
-        _?.name || '------------',
+        _?.model || '------------',
+        _?.brandName || '------------',
+        _?.screenSize || '------------',
+        _?.description || '------------',
         actionBtns(_),
       ]),
-      totalCount: brands?.totalItems,
+      totalCount: products?.totalItems,
     }),
-    [brands],
+    [products],
   );
 
   useEffect(() => {
-    dispatch(brandsThunk.getAllBrands(filters));
+    dispatch(productsThunk.getAllProducts(filters));
   }, [filters, refetch]);
 
   return (
     <>
       <Head>
-        <title>WebNova | MANAGE BRANDS</title>
+        <title>WebNova | MANAGE PRODUCTS</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
 
@@ -139,12 +142,12 @@ const ManageBrands = () => {
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <LogoModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleBrand} />
+        <LogoModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleProduct} />
       </ModalWrapper>
 
       <div className="page-content">
         <Container fluid>
-          <BreadCrumb title="Manage Brands" />
+          <BreadCrumb title="Manage Products" />
           <Row>
             <Col lg={12}>
               <Card id="permissionList">
@@ -152,7 +155,7 @@ const ManageBrands = () => {
                   <Row className="g-4 align-items-center">
                     <div className="col-sm">
                       <div>
-                        <h5 className="card-title mb-0 fw-semibold">Manage Brands</h5>
+                        <h5 className="card-title mb-0 fw-semibold">Manage Products</h5>
                       </div>
                     </div>
                     <div className="col-sm-auto">
@@ -165,7 +168,7 @@ const ManageBrands = () => {
                           type="button"
                           className="btn btn-dark add-btn"
                           id="create-btn">
-                          <i className="ri-add-line align-bottom me-1" /> Create Brand
+                          <i className="ri-add-line align-bottom me-1" /> Create Product
                         </Button>
                       </div>
                     </div>
@@ -174,10 +177,10 @@ const ManageBrands = () => {
                 <div className="card-body pt-0">
                   <div>
                     <TableContainer
-                      columns={manageBrandsColumns}
+                      columns={manageProductsColumns}
                       data={brands_rows || []}
                       isLoading={tableLoading}
-                      isGeneralGlobalFilter
+                      isProductFilter
                       currentPage={+filters?.page}
                       totalCount={+totalCount}
                       itemsPerPage={+filters?.itemsPerPage}
@@ -194,4 +197,4 @@ const ManageBrands = () => {
   );
 };
 
-export default withAuthProtection(ManageBrands);
+export default withAuthProtection(ManageProducts);

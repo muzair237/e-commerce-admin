@@ -10,6 +10,10 @@ export const GET_ALL_BRANDS = 'get-all-brands';
 export const CREATE_BRAND = 'create-brand';
 export const UPDATE_BRAND = 'update-brand';
 
+// MANAGE PRODUCTS ENDPOINT(S)
+export const GET_ALL_PRODUCTS = 'get-all-products';
+export const GET_PRODUCT_FILTER_OPTIONS = 'get-product-filter-options';
+
 // PERMISSIONS ENDPOINT(S)
 export const GET_ALL_PERMISSIONS = 'get-all-permissions';
 export const CREATE_PERMISSION = 'create-permission';

@@ -120,3 +120,56 @@ export const convertToFormData = obj => {
 
   return formData;
 };
+
+export const prepareProductFiltersData = (data = {}) => {
+  const brandOptions = data?.brandOptions?.map(item => ({
+    label: item?.name,
+    value: item?.id,
+  }));
+
+  const ramOptions = Object.keys(data?.ramOptions || {}).map(key => ({
+    label: data?.ramOptions[key],
+    value: key,
+  }));
+
+  const storageTypeOptions = Object.keys(data?.storageTypeOptions || {}).map(key => ({
+    label: data?.storageTypeOptions[key],
+    value: key,
+  }));
+
+  const storageSizeOptions = Object.keys(data?.storageSizeOptions || {}).map(key => ({
+    label: data?.storageSizeOptions[key],
+    value: key,
+  }));
+
+  const processorNameOptions = Object.keys(data?.processorNameoptions || {}).map(key => ({
+    label: data?.processorNameoptions[key],
+    value: key,
+  }));
+
+  const processorGenOptions = Object.keys(data?.processorGenOptions || {}).map(key => ({
+    label: data?.processorGenOptions[key],
+    value: key,
+  }));
+
+  const graphicsCardTypeOptions = Object.keys(data?.graphicsCardTypeOptions || {}).map(key => ({
+    label: data?.graphicsCardTypeOptions[key],
+    value: key,
+  }));
+
+  const graphicsCardMemorySizes = Object.keys(data?.graphicsCardMemorySizes || {}).map(key => ({
+    label: data?.graphicsCardMemorySizes[key],
+    value: key,
+  }));
+
+  return {
+    brandOptions,
+    ramOptions,
+    storageTypeOptions,
+    storageSizeOptions,
+    processorNameOptions,
+    processorGenOptions,
+    graphicsCardTypeOptions,
+    graphicsCardMemorySizes,
+  };
+};

@@ -1,6 +1,9 @@
 // MANAGE BRANDS COLUMN(S)
 export const manageBrandsColumns = ['Created At', 'Name', 'Actions'];
 
+// MANAGE PRODUCTS COLUMN(S)
+export const manageProductsColumns = ['Created At', 'Model', 'Brand', 'Screen Size', 'Description', 'Actions'];
+
 // PERMISSION COLUMN(S)
 export const permissionColumns = ['Created At', 'Can', 'Description', 'Group', 'Actions'];
 

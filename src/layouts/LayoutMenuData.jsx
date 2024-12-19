@@ -5,6 +5,7 @@ const Navdata = () => {
   const router = useRouter();
   const [isDashboard, setIsDashboard] = useState(false);
   const [isManageBrands, setIsManageBrands] = useState(false);
+  const [isManageProducts, setIsManageProducts] = useState(false);
 
   const [iscurrentState, setIscurrentState] = useState('Dashboard');
 
@@ -49,7 +50,7 @@ const Navdata = () => {
     {
       id: 'manage-brands',
       label: 'Manage Brands',
-      icon: ' ri-price-tag-fill',
+      icon: 'ri-price-tag-fill',
       path: '/manage-brands',
       stateVariables: isManageBrands,
       click(e) {
@@ -59,7 +60,21 @@ const Navdata = () => {
         updateIconSidebar(e);
       },
     },
+    {
+      id: 'manage-products',
+      label: 'Manage Products',
+      icon: 'bx bxs-package',
+      path: '/manage-products',
+      stateVariables: isManageProducts,
+      click(e) {
+        e.preventDefault();
+        setIsManageProducts(!isManageProducts);
+        setIscurrentState('isManageProducts');
+        updateIconSidebar(e);
+      },
+    },
   ];
+
   return <>{menuItems}</>;
 };
 export default Navdata;

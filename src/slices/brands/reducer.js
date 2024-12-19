@@ -7,7 +7,7 @@ const initialState = {
   tableLoading: false,
 };
 
-const authSlice = createSlice({
+const brandSlice = createSlice({
   name: 'brands',
   initialState,
   reducers: {},
@@ -27,4 +27,4 @@ const authSlice = createSlice({
   },
 });
 
-export default authSlice.reducer;
+export default brandSlice.reducer;

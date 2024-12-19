@@ -3,30 +3,33 @@ import PropTypes from 'prop-types';
 import { Row } from 'reactstrap';
 
 import Skeleton from '../Atoms/Skeleton';
-import GlobalFilter from './GlobalFilter';
+// import GlobalFilter from './GlobalFilter';
 import Pagination from '../Molecules/Pagination';
+import GeneralGlobalFilter from '../Filters/GeneralGlobalFilters';
+import ProductFilter from '../Filters/ProductFilter';
 
 const TableContainer = ({
   columns,
   data,
-  isGlobalFilter,
+  isGeneralGlobalFilter,
+  isProductFilter,
   isLoading,
-  isGeneralFilter,
   isRoleFilter,
   isAdminFilter,
   currentPage,
   totalCount,
   itemsPerPage,
   setFilters,
-  ...props
+  // ...props
 }) => (
   <>
     <Row className="mb-3">
-      {isGlobalFilter && isGeneralFilter && <GlobalFilter isGeneralFilter={isGeneralFilter} setFilters={setFilters} />}
-      {isGlobalFilter && isRoleFilter && <GlobalFilter isRoleFilter={isRoleFilter} setFilters={setFilters} />}
+      {isGeneralGlobalFilter && <GeneralGlobalFilter setFilters={setFilters} />}
+      {isProductFilter && <ProductFilter setFilters={setFilters} />}
+      {/* {isGlobalFilter && isRoleFilter && <GlobalFilter isRoleFilter={isRoleFilter} setFilters={setFilters} />}
       {isGlobalFilter && isAdminFilter && (
         <GlobalFilter isAdminFilter={isAdminFilter} setFilters={setFilters} {...props} />
-      )}
+      )} */}
     </Row>
     <div className="table-responsive table-card mt-3 mb-1">
       <table className="table align-middle" id="Table">
@@ -83,9 +86,9 @@ const TableContainer = ({
 TableContainer.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.string).isRequired,
   data: PropTypes.shape({}).isRequired,
-  isGlobalFilter: PropTypes.bool,
+  isGeneralGlobalFilter: PropTypes.bool,
+  isProductFilter: PropTypes.bool,
   isLoading: PropTypes.bool.isRequired,
-  isGeneralFilter: PropTypes.bool,
   isRoleFilter: PropTypes.bool,
   isAdminFilter: PropTypes.bool,
   currentPage: PropTypes.number.isRequired,
