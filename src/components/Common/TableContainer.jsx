@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Row } from 'reactstrap';
-import Skeleton from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
+
+import Skeleton from '../Atoms/Skeleton';
 import GlobalFilter from './GlobalFilter';
 import Pagination from '../Molecules/Pagination';
 
@@ -30,7 +31,15 @@ const TableContainer = ({
     <div className="table-responsive table-card mt-3 mb-1">
       <table className="table align-middle" id="Table">
         <thead className="table-light">
-          <tr>{columns && columns.length > 0 && columns.map(column => <th className="text-muted">{column}</th>)}</tr>
+          <tr>
+            {columns &&
+              columns.length > 0 &&
+              columns.map(column => (
+                <th key={column} className="text-muted">
+                  {column}
+                </th>
+              ))}
+          </tr>
         </thead>
         <tbody className="list form-check-all">
           {isLoading ? (
@@ -46,10 +55,10 @@ const TableContainer = ({
                 </tr>
               ))
           ) : data && data.length > 0 ? (
-            data.map((rows, index) => (
-              <tr key={index}>
-                {rows.map((el, i) => (
-                  <td key={i}>{el}</td>
+            data.map(rows => (
+              <tr key={rows?.name}>
+                {rows.map(el => (
+                  <td key={el}>{el}</td>
                 ))}
               </tr>
             ))
@@ -70,5 +79,19 @@ const TableContainer = ({
     <Pagination setFilters={setFilters} currentPage={currentPage} totalCount={totalCount} itemsPerPage={itemsPerPage} />
   </>
 );
+
+TableContainer.propTypes = {
+  columns: PropTypes.arrayOf(PropTypes.string).isRequired,
+  data: PropTypes.shape({}).isRequired,
+  isGlobalFilter: PropTypes.bool,
+  isLoading: PropTypes.bool.isRequired,
+  isGeneralFilter: PropTypes.bool,
+  isRoleFilter: PropTypes.bool,
+  isAdminFilter: PropTypes.bool,
+  currentPage: PropTypes.number.isRequired,
+  totalCount: PropTypes.number.isRequired,
+  itemsPerPage: PropTypes.number.isRequired,
+  setFilters: PropTypes.func,
+};
 
 export default TableContainer;

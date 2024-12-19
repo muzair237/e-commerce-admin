@@ -1,4 +1,19 @@
+import { useSelector } from 'react-redux';
 import { Toast } from '@/components/Molecules/Toast';
+
+export const GetCurrentAppearanceState = () => {
+  const { layoutModeType } = useSelector(state => state?.Layout);
+
+  return layoutModeType;
+};
+
+export const getSkeletonStyle = () => {
+  const appearance = GetCurrentAppearanceState();
+
+  return appearance === 'dark'
+    ? { backgroundColor: '#5f6368', color: '#a3a3a3' }
+    : { backgroundColor: '#e5f3f8', color: '#92c9d7' };
+};
 
 export const setCookie = (name, value, domain, days) => {
   let expires = '';

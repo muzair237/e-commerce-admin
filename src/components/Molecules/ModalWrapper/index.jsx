@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { ModalBody, ModalFooter } from 'reactstrap';
 
 import { IoCloseOutline } from 'react-icons/io5';
-import { StyledModal, ModalHeader } from './ModalWrapper.styles';
 import Button from '@/components/Atoms/Button';
+import { StyledModal, ModalHeader } from './ModalWrapper.styles';
 
 const ModalWrapper = ({
   isOpen,

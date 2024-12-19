@@ -60,7 +60,6 @@ const UploadFile = ({
       preview: URL.createObjectURL(file),
       formattedSize: formatBytes(file.size),
     }));
-    console.log('selectedFile: ', selectedFile);
     onChange(selectedFile);
 
     setSelectedFiles(prev => {
@@ -80,6 +79,7 @@ const UploadFile = ({
 
   const handleDelete = fileToDelete => {
     setSelectedFiles(prevFiles => prevFiles.filter(file => file.preview !== fileToDelete.preview));
+    onChange(null);
   };
 
   useEffect(() => {

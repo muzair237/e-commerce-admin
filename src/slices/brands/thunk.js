@@ -1,8 +1,9 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+
 import { handleThunkError } from '@/helpers/common';
 import { Toast } from '@/components/Molecules/Toast';
 import { Fetch } from '../../helpers/fetchWrapper';
-import { GET_ALL_BRANDS, UPDATE_BRAND } from '../../helpers/url_helper';
+import { GET_ALL_BRANDS, CREATE_BRAND, UPDATE_BRAND } from '../../helpers/url_helper';
 
 const brandsThunk = {
   url: `${process.env.NEXT_PUBLIC_BRANDS_API_URL}`,
@@ -36,6 +37,26 @@ const brandsThunk = {
     },
   ),
 
+  createBrand: createAsyncThunk('brand/createBrand', async ({ payload }) => {
+    try {
+      let res = await Fetch.upload(`${brandsThunk.url}/${CREATE_BRAND}`, 'POST', payload);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Brand created successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
   updateBrand: createAsyncThunk('brand/updateBrand', async ({ id, payload }) => {
     try {
       let res = await Fetch.upload(`${brandsThunk.url}/${UPDATE_BRAND}/${id}`, 'PUT', payload);
@@ -50,12 +71,9 @@ const brandsThunk = {
       }
       const { message } = await res.json();
       throw new Error(message ?? 'Something Went Wrong');
-    } catch ({ message }) {
-      Toast({
-        type: 'error',
-        message,
-      });
-      throw message;
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
     }
   }),
 };

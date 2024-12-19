@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Head from 'next/head';
-import { Col, Container, Row, Card, CardHeader, UncontrolledTooltip } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { MdRemoveRedEye, MdOutlineModeEdit, MdDeleteOutline } from 'react-icons/md';
+import { Col, Container, Row, Card, CardHeader, UncontrolledTooltip } from 'reactstrap';
+import { useContextHook } from 'use-context-hook';
+import { MdRemoveRedEye, MdOutlineModeEdit } from 'react-icons/md';
+import { format } from 'date-fns';
+
 import brandsThunk from '@/slices/brands/thunk';
 import { manageBrandsColumns } from '@/common/columns';
-import { format } from 'date-fns';
-import { useContextHook } from 'use-context-hook';
 import { UtilsContext } from '@/contexts/utilsContext';
 import { handleApiCall, convertToFormData } from '@/helpers/common';
 import BreadCrumb from '@/components/Common/BreadCrumb';
@@ -14,8 +15,8 @@ import TableContainer from '@/components/Common/TableContainer';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
 import LogoModal from '@/components/Organisms/LogoModal';
 import Anchor from '@/components/Molecules/Anchor';
-import withAuthProtection from '../components/Common/withAuthProtection';
 import Button from '@/components/Atoms/Button';
+import withAuthProtection from '@/components/Common/withAuthProtection';
 
 const ManageBrands = () => {
   const dispatch = useDispatch();
@@ -55,6 +56,13 @@ const ManageBrands = () => {
             ...(logo instanceof File && { logo }),
           }),
         });
+      } else {
+        success = await handleApiCall(dispatch, brandsThunk.createBrand, {
+          payload: convertToFormData({
+            name,
+            logo,
+          }),
+        });
       }
 
       if (success) {
@@ -86,7 +94,7 @@ const ManageBrands = () => {
         <MdOutlineModeEdit
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            setCurrentLogo({ name: _?.name, logo: _?.logo });
+            setCurrentLogo({ id: _?.id, name: _?.name, logo: _?.logo });
             setLogoModal(true);
           }}
           color="green"
@@ -131,7 +139,7 @@ const ManageBrands = () => {
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <LogoModal currentLogo isLoading={isLoading} handleClick={handleBrand} />
+        <LogoModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleBrand} />
       </ModalWrapper>
 
       <div className="page-content">
@@ -155,7 +163,7 @@ const ManageBrands = () => {
                             setLogoModal(true);
                           }}
                           type="button"
-                          className="btn btn-success add-btn"
+                          className="btn btn-dark add-btn"
                           id="create-btn">
                           <i className="ri-add-line align-bottom me-1" /> Create Brand
                         </Button>
@@ -171,9 +179,9 @@ const ManageBrands = () => {
                       isGlobalFilter
                       isLoading={tableLoading}
                       isGeneralFilter
-                      currentPage={filters?.page}
-                      totalCount={totalCount}
-                      itemsPerPage={filters?.itemsPerPage}
+                      currentPage={+filters?.page}
+                      totalCount={+totalCount}
+                      itemsPerPage={+filters?.itemsPerPage}
                       setFilters={setSearchQueryCallback}
                     />
                   </div>

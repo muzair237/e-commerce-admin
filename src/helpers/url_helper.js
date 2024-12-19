@@ -7,6 +7,7 @@ export const LOGOUT = 'logout';
 
 // MANAGE BRANDS ENDPOINT(S)
 export const GET_ALL_BRANDS = 'get-all-brands';
+export const CREATE_BRAND = 'create-brand';
 export const UPDATE_BRAND = 'update-brand';
 
 // PERMISSIONS ENDPOINT(S)
