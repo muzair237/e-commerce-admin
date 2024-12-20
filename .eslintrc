@@ -12,7 +12,7 @@
   "plugins": ["@typescript-eslint", "jsx-a11y", "prettier"],
   "ignorePatterns": ["./client/tests/*", "./client/styles/*"],
   "rules": {
-    "indent": ["error", 2],
+    // "indent": ["error", 2],
     "quotes": ["error", "single", { "avoidEscape": true }],
     "comma-dangle": ["error", "always-multiline"],
     "no-unused-vars": ["warn"],

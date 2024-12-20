@@ -47,7 +47,6 @@
     "date-fns": "^3.6.0",
     "echarts-for-react": "^3.0.2",
     "env-cmd": "^10.1.0",
-    "formik": "^2.4.5",
     "lodash": "^4.17.21",
     "next": "14.1.0",
     "rc-util": "^5.44.2",
@@ -69,8 +68,8 @@
     "sass": "^1.71.1",
     "simplebar-react": "^3.2.4",
     "styled-components": "^6.1.8",
-    "use-context-hook": "^2.0.5",
-    "yup": "^1.4.0"
+    "swiper": "^11.1.14",
+    "use-context-hook": "^2.0.5"
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.3.3",

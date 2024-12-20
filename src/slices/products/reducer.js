@@ -4,6 +4,7 @@ import productsThunk from './thunk';
 
 const initialState = {
   products: {},
+  productVariants: [],
   tableLoading: false,
   productFilterOptions: {},
 };
@@ -26,9 +27,13 @@ const productSlice = createSlice({
         state.tableLoading = false;
       })
 
+      // GET PRODUCT VARIANTS
+      .addCase(productsThunk.getProductVariants.fulfilled, (state, action) => {
+        state.productVariants = action.payload;
+      })
+
       // GET PRODUCT FILTER OPTIONS
       .addCase(productsThunk.getProductFilterOptions.fulfilled, (state, action) => {
-        console.log('action.payload: ', action.payload);
         state.productFilterOptions = action.payload;
       });
   },

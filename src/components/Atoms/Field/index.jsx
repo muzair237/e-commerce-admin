@@ -9,7 +9,24 @@ import Label from '../Label';
 import InputIcon from '../InputIcon';
 
 const Field = forwardRef(
-  ({ label, name, type, placeholder, disabled, options, prefix, suffix, rules, invalid, error, ...props }, ref) => {
+  (
+    {
+      label,
+      name,
+      type,
+      placeholder,
+      disabled,
+      options,
+      prefix,
+      suffix,
+      rules,
+      invalid,
+      error,
+      isClearable = true,
+      ...props
+    },
+    ref,
+  ) => {
     const [passwordShow, setPasswordShow] = useState(false);
     const isFieldrequired = !!rules?.filter(({ required }) => required).length;
     const isError = !!(invalid || error);
@@ -57,9 +74,17 @@ const Field = forwardRef(
             </div>
           ) : type === 'select' ? (
             <Select
+              styles={{
+                control: provided => ({
+                  ...provided,
+                  borderColor: isError ? 'red' : provided.borderColor,
+                  transition: 'border-color 0.5s ease',
+                }),
+              }}
+              isClearable={isClearable}
+              disabled={disabled}
               ref={ref}
               name={name}
-              onChange={selectedOption => props.onChange(name, selectedOption)}
               options={options}
               {...props}
             />
@@ -67,6 +92,7 @@ const Field = forwardRef(
             <StyledInput
               as="textarea"
               rows={3}
+              disabled={disabled}
               name={name}
               className="form-control"
               placeholder={placeholder}
@@ -79,6 +105,7 @@ const Field = forwardRef(
               ref={ref}
               name={name}
               type={type}
+              disabled={disabled}
               className="form-control"
               placeholder={placeholder}
               $isInvalid={isError}
@@ -121,6 +148,7 @@ Field.propTypes = {
       required: PropTypes.bool,
     }),
   ),
+  isClearable: PropTypes.bool,
   invalid: PropTypes.bool,
   error: PropTypes.string,
 };

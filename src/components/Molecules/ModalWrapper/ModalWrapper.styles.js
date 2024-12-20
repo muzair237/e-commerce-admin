@@ -2,6 +2,8 @@ import styled from 'styled-components';
 import { Modal } from 'reactstrap';
 
 export const StyledModal = styled(Modal)`
+  width: ${({ $width }) => $width && `${$width}px`};
+
   .modal-content {
     border-radius: 15px;
   }

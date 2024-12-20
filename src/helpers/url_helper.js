@@ -13,6 +13,7 @@ export const UPDATE_BRAND = 'update-brand';
 // MANAGE PRODUCTS ENDPOINT(S)
 export const GET_ALL_PRODUCTS = 'get-all-products';
 export const GET_PRODUCT_FILTER_OPTIONS = 'get-product-filter-options';
+export const GET_PRODUCT_VARIANTS = 'get-product-variants';
 
 // PERMISSIONS ENDPOINT(S)
 export const GET_ALL_PERMISSIONS = 'get-all-permissions';

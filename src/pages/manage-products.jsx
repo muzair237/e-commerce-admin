@@ -3,7 +3,9 @@ import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import { Col, Container, Row, Card, CardHeader, UncontrolledTooltip } from 'reactstrap';
 import { useContextHook } from 'use-context-hook';
-import { MdRemoveRedEye, MdOutlineModeEdit } from 'react-icons/md';
+import { MdOutlineModeEdit } from 'react-icons/md';
+import { RiShapesFill } from 'react-icons/ri';
+import { PiImages } from 'react-icons/pi';
 import { format } from 'date-fns';
 
 import productsThunk from '@/slices/products/thunk';
@@ -13,15 +15,19 @@ import { handleApiCall, convertToFormData } from '@/helpers/common';
 import BreadCrumb from '@/components/Common/BreadCrumb';
 import TableContainer from '@/components/Common/TableContainer';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
-import LogoModal from '@/components/Organisms/LogoModal';
-import Anchor from '@/components/Molecules/Anchor';
 import Button from '@/components/Atoms/Button';
 import withAuthProtection from '@/components/Common/withAuthProtection';
+import ProductFilters from '@/components/Organisms/ProductFiltersModal';
+import ProductVariants from '@/components/Organisms/ViewProductVariantsModal';
+import ProductImages from '@/components/Organisms/ProductImagesModal';
 
 const ManageProducts = () => {
   const dispatch = useDispatch();
-  const [currentLogo, setCurrentLogo] = useState({});
+  const [currentProduct, setCurrentProduct] = useState({});
   const [logoModal, setLogoModal] = useState(false);
+  const [advancedFilterModal, setAdvancedFilterModal] = useState(false);
+  const [productVariantsModal, setProductVariantsModal] = useState(false);
+  const [productImagesModal, setProductImagesModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { products } = useSelector(state => state?.Product) || {};
   const { tableLoading } = useSelector(state => state?.Brand) || false;
@@ -41,60 +47,76 @@ const ManageProducts = () => {
     setFilters(newSearchQuery);
   }, []);
 
-  const handleProduct = async payload => {
-    try {
-      const { name, logo } = payload;
+  // const handleProduct = async payload => {
+  //   try {
+  //     const { name, logo } = payload;
 
-      setIsLoading(true);
+  //     setIsLoading(true);
 
-      let success;
-      if (Object?.keys(currentLogo)?.length > 0) {
-        success = await handleApiCall(dispatch, productsThunk.updateBrand, {
-          id: currentLogo?.id,
-          payload: convertToFormData({
-            name,
-            ...(logo instanceof File && { logo }),
-          }),
-        });
-      } else {
-        success = await handleApiCall(dispatch, productsThunk.createBrand, {
-          payload: convertToFormData({
-            name,
-            logo,
-          }),
-        });
-      }
+  //     let success;
+  //     if (Object?.keys(currentProduct)?.length > 0) {
+  //       success = await handleApiCall(dispatch, productsThunk.updateBrand, {
+  //         id: currentProduct?.id,
+  //         payload: convertToFormData({
+  //           name,
+  //           ...(logo instanceof File && { logo }),
+  //         }),
+  //       });
+  //     } else {
+  //       success = await handleApiCall(dispatch, productsThunk.createBrand, {
+  //         payload: convertToFormData({
+  //           name,
+  //           logo,
+  //         }),
+  //       });
+  //     }
 
-      if (success) {
-        setLogoModal(false);
-        setRefetch(prev => !prev);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     if (success) {
+  //       setLogoModal(false);
+  //       setRefetch(prev => !prev);
+  //     }
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const actionBtns = _ => (
     <div className="d-flex gap-3">
-      <div className="viewLogo">
-        <Anchor href={_?.logo} target="_blank">
-          <MdRemoveRedEye
-            style={{ cursor: 'pointer' }}
-            onClick={() => setCurrentLogo(_)}
-            color="#007BFF"
-            size={19}
-            id="viewLogo"
-          />
-        </Anchor>
-        <UncontrolledTooltip placement="top" target="viewLogo">
-          View Logo
+      <div className="viewImages">
+        <PiImages
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setCurrentProduct({ model: _?.model, images: _?.images });
+            setProductImagesModal(true);
+          }}
+          color="#007BFF"
+          size={19}
+          id="viewImages"
+        />
+        <UncontrolledTooltip placement="top" target="viewImages">
+          View Images
+        </UncontrolledTooltip>
+      </div>
+      <div className="viewVariants">
+        <RiShapesFill
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setCurrentProduct({ id: _?.id, model: _?.model });
+            setProductVariantsModal(true);
+          }}
+          color="#007BFF"
+          size={19}
+          id="viewVariants"
+        />
+        <UncontrolledTooltip placement="top" target="viewVariants">
+          View Variants
         </UncontrolledTooltip>
       </div>
       <div className="edit">
         <MdOutlineModeEdit
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            setCurrentLogo({ id: _?.id, name: _?.name, logo: _?.logo });
+            setCurrentProduct({ id: _?.id, name: _?.name, logo: _?.logo });
             setLogoModal(true);
           }}
           color="green"
@@ -134,15 +156,37 @@ const ManageProducts = () => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
 
-      {/* Logo Modal */}
+      {/* Advance Filter Modal */}
       <ModalWrapper
-        isOpen={logoModal}
-        toggle={() => setLogoModal(false)}
-        title={currentLogo?.name?.toUpperCase() || 'Create Brand'}
+        isOpen={advancedFilterModal}
+        toggle={() => setAdvancedFilterModal(false)}
+        title="Advanced Filter"
+        size="xl"
+        backdrop="static"
+        isContentCentered={false}>
+        <ProductFilters />
+      </ModalWrapper>
+
+      {/* Product Images Modal */}
+      <ModalWrapper
+        isOpen={productImagesModal}
+        toggle={() => setProductImagesModal(false)}
+        title={`Images of ${currentProduct?.model}`}
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <LogoModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleProduct} />
+        <ProductImages images={currentProduct?.images} />
+      </ModalWrapper>
+
+      {/* Product Variants Modal */}
+      <ModalWrapper
+        isOpen={productVariantsModal}
+        toggle={() => setProductVariantsModal(false)}
+        title={`Variants of ${currentProduct?.model}`}
+        size="xl"
+        backdrop="static"
+        isContentCentered={false}>
+        <ProductVariants id={currentProduct?.id} />
       </ModalWrapper>
 
       <div className="page-content">
@@ -162,7 +206,20 @@ const ManageProducts = () => {
                       <div>
                         <Button
                           onClick={() => {
-                            setCurrentLogo({});
+                            setAdvancedFilterModal(true);
+                          }}
+                          type="button"
+                          className="btn btn-secondary add-btn"
+                          id="create-btn">
+                          <i className="bx bx-search-alt search-icon" /> Advanced Filter
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="col-sm-auto">
+                      <div>
+                        <Button
+                          onClick={() => {
+                            setCurrentProduct({});
                             setLogoModal(true);
                           }}
                           type="button"

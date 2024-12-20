@@ -42,17 +42,19 @@ export default class Field extends Component {
       value: getFieldValue(name) ?? '',
       onChange: event => {
         let newValue;
-        if (event instanceof File) {
-          newValue = event;
-        } else if (
-          typeof event?.target?.value === 'object' ||
-          Array.isArray(event?.target?.value) ||
-          typeof event?.target?.value === 'boolean'
-        ) {
-          newValue = event?.target?.value ?? '';
-        } else {
-          newValue = event?.target?.value?.replace(/\s{2,}/g, ' ') ?? '';
+
+        if (event !== null) {
+          if (event instanceof File) {
+            newValue = event;
+          } else if (typeof event === 'object' && 'label' in event && 'value' in event && event !== null) {
+            newValue = event;
+          } else if (Array.isArray(event?.target?.value) || typeof event?.target?.value === 'boolean') {
+            newValue = event?.target?.value ?? '';
+          } else {
+            newValue = event?.target?.value?.replace(/\s{2,}/g, ' ') ?? '';
+          }
         }
+        // Update the field's value
         setFieldsValue({ [name]: newValue });
       },
     };

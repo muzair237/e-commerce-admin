@@ -16,6 +16,13 @@ const GeneralGlobalFilter = ({ setFilters }) => {
   const [permissionFilter, setPermissionFilter] = useState({ label: 'Latest', value: 'latest' });
   const [typeFilter, setTypeFilter] = useState({ label: 'All', value: 'all' });
 
+  const isClearButtonDisabled = !(
+    searchText ||
+    permissionFilter.value !== 'latest' ||
+    typeFilter.value !== 'all' ||
+    (flatpickrRef.current && flatpickrRef.current.flatpickr.selectedDates.length > 0)
+  );
+
   const options = [
     { label: 'A - Z', value: 'asc' },
     { label: 'Z - A', value: 'desc' },
@@ -130,20 +137,11 @@ const GeneralGlobalFilter = ({ setFilters }) => {
               </div>
             </Col>
             <Col>
-              <Button
-                onClick={clearFilters}
-                className="btn"
-                disabled={
-                  !(
-                    searchText ||
-                    permissionFilter.value !== 'latest' ||
-                    typeFilter.value !== 'all' ||
-                    (flatpickrRef.current && flatpickrRef.current.flatpickr.selectedDates.length > 0)
-                  )
-                }
-                color="danger">
-                Clear All Filters <RxCrossCircled size={20} />
-              </Button>
+              {!isClearButtonDisabled && (
+                <Button onClick={clearFilters} className="btn" color="danger">
+                  Clear All Filters <RxCrossCircled size={20} />
+                </Button>
+              )}
             </Col>
           </Row>
         </Col>
