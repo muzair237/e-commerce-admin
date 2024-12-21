@@ -1,10 +1,16 @@
-import React, { useEffect } from 'react';
-import { Row, Col } from 'reactstrap';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Row, Col, UncontrolledTooltip } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
 import productsThunk from '@/slices/products/thunk';
-import { prepareProductFiltersData } from '@/helpers/common';
+import { prepareProductFiltersData, traverseAndModifyObject } from '@/helpers/common';
 import { manageProductsColumns } from '@/common/columns';
+import { format } from 'date-fns';
+import { PiImages } from 'react-icons/pi';
+import { VscGitPullRequestCreate } from 'react-icons/vsc';
+import { RiShapesFill } from 'react-icons/ri';
+import { MdOutlineModeEdit } from 'react-icons/md';
+import { clearAdvancedSearchProducts } from '@/slices/products/reducer';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
 import TableContainer from '@/components/Common/TableContainer';
@@ -13,8 +19,18 @@ import Form, { useForm } from '../Form';
 const AdvancedProductFilter = () => {
   const dispatch = useDispatch();
   const [form] = useForm();
+  const [paginationFilters, setPaginationFilters] = useState({
+    page: 1,
+    itemsPerPage: 2,
+    getAll: false,
+  });
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showTable, setShowTable] = useState(false);
+  const [allFilters, setAllFilters] = useState({});
 
   const { productFilterOptions } = useSelector(state => state?.Product) || {};
+  const { advancedSearchProducts } = useSelector(state => state?.Product) || {};
 
   const sortOptions = [
     { label: 'A - Z', value: 'asc' },
@@ -34,25 +50,154 @@ const AdvancedProductFilter = () => {
     graphicsCardMemorySizes,
   } = prepareProductFiltersData(productFilterOptions);
 
-  const onSubmit = payload => {
-    console.log('payload: ', payload);
+  const onSubmit = async values => {
+    try {
+      setIsLoading(true);
+      const payload = {
+        ...traverseAndModifyObject(values),
+        ...(values?.minPrice && { minPrice: parseInt(values.minPrice, 10) }),
+        ...(values?.maxPrice && { maxPrice: parseInt(values.maxPrice, 10) }),
+        ...(values?.brand?.value && { brand: values.brand.value }),
+        ...(values?.sort?.value && { sort: values.sort.value }),
+        ...paginationFilters,
+      };
+
+      setAllFilters(payload);
+      await dispatch(productsThunk.advancedProductSearch({ payload }));
+      setShowTable(true);
+    } catch (error) {
+      console.log('Error in performing advanced product search: ', error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     dispatch(productsThunk.getProductFilterOptions());
   }, []);
 
+  const setSearchQueryCallback = useCallback(newSearchQuery => {
+    setPaginationFilters(newSearchQuery);
+  }, []);
+
+  const actionBtns = _ => (
+    <div className="d-flex gap-3">
+      <div className="viewImages">
+        <PiImages
+          style={{ cursor: 'pointer' }}
+          // onClick={() => {
+          //   setCurrentProduct({ model: _?.model, images: _?.images });
+          //   setProductImagesModal(true);
+          // }}
+          color="#007BFF"
+          size={19}
+          id="viewImages"
+        />
+        <UncontrolledTooltip placement="top" target="viewImages">
+          View Images
+        </UncontrolledTooltip>
+      </div>
+      <div className="createVariant">
+        <VscGitPullRequestCreate
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            // setCurrentProduct({ id: _?.id });
+            // setCreateVariantModal(true);
+          }}
+          color="#007BFF"
+          size={19}
+          id="createVariant"
+        />
+        <UncontrolledTooltip placement="top" target="createVariant">
+          Create Variant
+        </UncontrolledTooltip>
+      </div>
+      <div className="viewVariants">
+        <RiShapesFill
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            // setCurrentProduct({ id: _?.id, model: _?.model });
+            // setProductVariantsModal(true);
+          }}
+          color="#007BFF"
+          size={19}
+          id="viewVariants"
+        />
+        <UncontrolledTooltip placement="top" target="viewVariants">
+          View Variants
+        </UncontrolledTooltip>
+      </div>
+      <div className="edit">
+        <MdOutlineModeEdit
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            // setCurrentProduct({ id: _?.id, name: _?.name, logo: _?.logo });
+          }}
+          color="green"
+          size={19}
+          id="edit"
+        />
+        <UncontrolledTooltip placement="top" target="edit">
+          Edit
+        </UncontrolledTooltip>
+      </div>
+    </div>
+  );
+
+  const { product_rows, totalCount } = useMemo(
+    () => ({
+      product_rows: advancedSearchProducts?.items?.map(_ => [
+        format(new Date(_?.created_at), 'MMMM dd, yyyy') || '------------',
+        _?.model || '------------',
+        _?.brand?.name || '------------',
+        _?.screenSize || '------------',
+        _?.description || '------------',
+        _?.noOfVariants || '------------',
+        actionBtns(_),
+      ]),
+      totalCount: advancedSearchProducts?.totalItems,
+    }),
+    [advancedSearchProducts],
+  );
+
+  const clearAllFilters = () => {
+    setPaginationFilters({
+      page: 1,
+      itemsPerPage: 2,
+      getAll: false,
+    });
+  };
+
+  useEffect(() => {
+    if (isFirstRender) {
+      dispatch(clearAdvancedSearchProducts());
+      setIsFirstRender(false);
+
+      return;
+    }
+    onSubmit(allFilters);
+  }, [paginationFilters]);
+
   return (
     <>
       <Row>
         <Col lg={12}>
-          <Form form={form} onSubmit={onSubmit}>
+          <Form
+            form={form}
+            onSubmit={values => {
+              setPaginationFilters({
+                page: 1,
+                itemsPerPage: 2,
+                getAll: false,
+              });
+              onSubmit(values);
+            }}>
             <Row className="mb-3">
               <Col>
                 <Form.Item
                   label="Search Text"
                   type="text"
-                  name="brand"
+                  name="searchText"
                   placeholder="Search for laptops..."
                   options={brandOptions}>
                   <Field />
@@ -103,7 +248,7 @@ const AdvancedProductFilter = () => {
               <Col>
                 <Form.Item
                   label="Processor Generation"
-                  name="processorGen"
+                  name="processorGeneration"
                   type="select"
                   placeholder="Select Processor Gen"
                   options={processorGenOptions}>
@@ -133,17 +278,17 @@ const AdvancedProductFilter = () => {
             </Row>
             <Row className="mb-3">
               <Col>
-                <Form.Item label="Min Price" name="minPrice" placeholder="Min Price">
-                  <Field type="number" />
+                <Form.Item label="Min Price" type="number" name="minPrice" placeholder="Min Price">
+                  <Field />
                 </Form.Item>
               </Col>
               <Col>
-                <Form.Item label="Max Price" name="maxPrice" placeholder="Max Price">
-                  <Field type="number" />
+                <Form.Item label="Max Price" type="number" name="maxPrice" placeholder="Max Price">
+                  <Field />
                 </Form.Item>
               </Col>
               <Col>
-                <Form.Item label="Sort By" type="select" name="brand" placeholder="Select" options={sortOptions}>
+                <Form.Item label="Sort By" type="select" name="sort" placeholder="Select" options={sortOptions}>
                   <Field />
                 </Form.Item>
               </Col>
@@ -151,12 +296,12 @@ const AdvancedProductFilter = () => {
             <Row className="mb-3 justify-content-end">
               {/* Show below button only when filters are applied */}
               <Col xs="auto">
-                <Button color="danger" type="button">
+                <Button onClick={clearAllFilters} color="danger" type="button">
                   Clear All Filters
                 </Button>
               </Col>
               <Col xs="auto">
-                <Button color="primary" type="submit">
+                <Button loading={isLoading} color="primary" type="submit">
                   Search Products
                 </Button>
               </Col>
@@ -164,19 +309,21 @@ const AdvancedProductFilter = () => {
           </Form>
         </Col>
       </Row>
-      <div className="card-body px-3">
-        <div>
-          <TableContainer
-            columns={manageProductsColumns}
-            data={[]}
-            isLoading
-            // currentPage={+filters?.page}
-            // totalCount={+totalCount}
-            // itemsPerPage={+filters?.itemsPerPage}
-            // setFilters={setSearchQueryCallback}
-          />
+      {(isLoading || advancedSearchProducts?.items?.length > 0 || showTable) && (
+        <div className="card-body px-3">
+          <div>
+            <TableContainer
+              columns={manageProductsColumns}
+              data={product_rows || []}
+              isLoading={isLoading}
+              currentPage={paginationFilters?.page}
+              totalCount={+totalCount}
+              itemsPerPage={paginationFilters?.itemsPerPage}
+              setFilters={setSearchQueryCallback}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 };

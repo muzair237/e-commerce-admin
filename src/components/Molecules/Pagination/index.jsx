@@ -7,7 +7,7 @@ import Button from '../../Atoms/Button';
 
 const Pagination = ({ setFilters, currentPage, totalCount, itemsPerPage }) => {
   const debounceRef = useRef(0);
-  const maxPage = Math.ceil(totalCount / itemsPerPage);
+  const maxPage = Math.ceil(totalCount / itemsPerPage) || 0;
 
   const onChangePageNumber = debounce(value => {
     debounceRef.current += 1;

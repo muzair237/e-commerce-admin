@@ -13,7 +13,11 @@ const initialState = {
 const productSlice = createSlice({
   name: 'products',
   initialState,
-  reducers: {},
+  reducers: {
+    clearAdvancedSearchProducts(state) {
+      state.advancedSearchProducts = {};
+    },
+  },
   extraReducers: builder => {
     builder
       // GET ALL PRODUCTS
@@ -44,5 +48,7 @@ const productSlice = createSlice({
       });
   },
 });
+
+export const { clearAdvancedSearchProducts } = productSlice.actions;
 
 export default productSlice.reducer;

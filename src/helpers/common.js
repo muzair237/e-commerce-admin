@@ -173,3 +173,17 @@ export const prepareProductFiltersData = (data = {}) => {
     graphicsCardMemorySizes,
   };
 };
+
+export const traverseAndModifyObject = (obj = {}) => {
+  const result = {};
+
+  Object.entries(obj).forEach(([key, value]) => {
+    if (value && typeof value === 'object' && Object.hasOwnProperty.call(value, 'label')) {
+      result[key] = value.label;
+    } else if (typeof value !== 'object') {
+      result[key] = value;
+    }
+  });
+
+  return result;
+};

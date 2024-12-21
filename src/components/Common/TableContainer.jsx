@@ -58,9 +58,9 @@ const TableContainer = ({
                 </tr>
               ))
           ) : data && data.length > 0 ? (
-            data.map(rows => (
+            data?.map(rows => (
               <tr key={rows?.name}>
-                {rows.map(el => (
+                {rows?.map(el => (
                   <td key={el}>{el}</td>
                 ))}
               </tr>
