@@ -1,8 +1,16 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
 import { handleThunkError } from '@/helpers/common';
+import { Toast } from '@/components/Molecules/Toast';
 import { Fetch } from '../../helpers/fetchWrapper';
-import { GET_ALL_PRODUCTS, GET_PRODUCT_VARIANTS, GET_PRODUCT_FILTER_OPTIONS } from '../../helpers/url_helper';
+import {
+  GET_ALL_PRODUCTS,
+  ADVANCED_PRODUCT_SEARCH,
+  GET_PRODUCT_VARIANTS,
+  GET_PRODUCT_FILTER_OPTIONS,
+  CREATE_PRODUCT_VARIANT,
+  UPDATE_PRODUCT_VARIANT,
+} from '../../helpers/url_helper';
 
 const productsThunk = {
   url: `${process.env.NEXT_PUBLIC_PRODUCTS_API_URL}`,
@@ -36,6 +44,22 @@ const productsThunk = {
     },
   ),
 
+  advancedProductSearch: createAsyncThunk('product/advanced-product-search', async ({ payload }) => {
+    try {
+      const res = await Fetch.post(`${productsThunk.url}/${ADVANCED_PRODUCT_SEARCH}`, payload);
+      if (res.status >= 200 && res.status < 300) {
+        const { data } = await res.json();
+
+        return data;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
   getProductFilterOptions: createAsyncThunk('product/get-product-filter-options', async () => {
     try {
       const res = await Fetch.get(`${productsThunk.url}/${GET_PRODUCT_FILTER_OPTIONS}`);
@@ -59,6 +83,46 @@ const productsThunk = {
         const { data } = await res.json();
 
         return data;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
+  createProductVariant: createAsyncThunk('product/create-product-variant', async ({ id, payload }) => {
+    try {
+      let res = await Fetch.post(`${productsThunk.url}/${CREATE_PRODUCT_VARIANT}/${id}`, payload);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Variant created successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
+  updateProductVariant: createAsyncThunk('product/update-product-variant', async ({ id, payload }) => {
+    try {
+      let res = await Fetch.put(`${productsThunk.url}/${UPDATE_PRODUCT_VARIANT}/${id}`, payload);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Variant updated successfully!',
+        });
+
+        return res;
       }
       const { message } = await res.json();
       throw new Error(message ?? 'Something Went Wrong');

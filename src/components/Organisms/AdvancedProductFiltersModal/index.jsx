@@ -4,17 +4,24 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import productsThunk from '@/slices/products/thunk';
 import { prepareProductFiltersData } from '@/helpers/common';
+import { manageProductsColumns } from '@/common/columns';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
-import Form, { useForm } from '../Form';
 import TableContainer from '@/components/Common/TableContainer';
-import { manageProductsColumns } from '@/common/columns';
+import Form, { useForm } from '../Form';
 
-const ProductFilters = () => {
+const AdvancedProductFilter = () => {
   const dispatch = useDispatch();
   const [form] = useForm();
 
   const { productFilterOptions } = useSelector(state => state?.Product) || {};
+
+  const sortOptions = [
+    { label: 'A - Z', value: 'asc' },
+    { label: 'Z - A', value: 'desc' },
+    { label: 'Latest', value: 'latest' },
+    { label: 'Earliest', value: 'earliest' },
+  ];
 
   const {
     brandOptions,
@@ -40,7 +47,17 @@ const ProductFilters = () => {
       <Row>
         <Col lg={12}>
           <Form form={form} onSubmit={onSubmit}>
-            <Row className="mb-4">
+            <Row className="mb-3">
+              <Col>
+                <Form.Item
+                  label="Search Text"
+                  type="text"
+                  name="brand"
+                  placeholder="Search for laptops..."
+                  options={brandOptions}>
+                  <Field />
+                </Form.Item>
+              </Col>
               <Col>
                 <Form.Item label="Brand" type="select" name="brand" placeholder="Select" options={brandOptions}>
                   <Field />
@@ -72,7 +89,7 @@ const ProductFilters = () => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row className="mb-4">
+            <Row className="mb-3">
               <Col>
                 <Form.Item
                   label="Processor Name"
@@ -125,8 +142,13 @@ const ProductFilters = () => {
                   <Field type="number" />
                 </Form.Item>
               </Col>
+              <Col>
+                <Form.Item label="Sort By" type="select" name="brand" placeholder="Select" options={sortOptions}>
+                  <Field />
+                </Form.Item>
+              </Col>
             </Row>
-            <Row className="mb-4 justify-content-end">
+            <Row className="mb-3 justify-content-end">
               {/* Show below button only when filters are applied */}
               <Col xs="auto">
                 <Button color="danger" type="button">
@@ -147,7 +169,7 @@ const ProductFilters = () => {
           <TableContainer
             columns={manageProductsColumns}
             data={[]}
-            isLoading={true}
+            isLoading
             // currentPage={+filters?.page}
             // totalCount={+totalCount}
             // itemsPerPage={+filters?.itemsPerPage}
@@ -159,4 +181,4 @@ const ProductFilters = () => {
   );
 };
 
-export default ProductFilters;
+export default AdvancedProductFilter;

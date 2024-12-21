@@ -74,6 +74,7 @@ const Field = forwardRef(
             </div>
           ) : type === 'select' ? (
             <Select
+              placeholder="Select..."
               styles={{
                 control: provided => ({
                   ...provided,
@@ -82,7 +83,7 @@ const Field = forwardRef(
                 }),
               }}
               isClearable={isClearable}
-              disabled={disabled}
+              isDisabled={disabled}
               ref={ref}
               name={name}
               options={options}

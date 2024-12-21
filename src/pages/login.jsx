@@ -54,7 +54,7 @@ const Login = () => {
                                 label="Email"
                                 type="text"
                                 name="email"
-                                placeholder="Email"
+                                placeholder="admin@example.com"
                                 rules={[{ required: true }]}>
                                 <Field />
                               </Form.Item>
@@ -64,7 +64,7 @@ const Login = () => {
                                 label="Password"
                                 type="password"
                                 name="password"
-                                placeholder="Password"
+                                placeholder="********"
                                 rules={[{ required: true }]}>
                                 <Field />
                               </Form.Item>

@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { Col, Row } from 'reactstrap';
 
-import { prepareProductFiltersData } from '@/helpers/common';
+import { handleApiCall, prepareProductFiltersData } from '@/helpers/common';
 import productsThunk from '@/slices/products/thunk';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
 import Form, { useForm } from '../Form';
 
-const ProductVariantModal = () => {
+const ProductVariantModal = ({ closeMeAndMyParent, productId, variant }) => {
   const dispatch = useDispatch();
   const [form] = useForm();
-  const [graphicsCardFieldType, setGraphicsCardFieldType] = useState('text');
-  const [isGraphicCardTypeDisabled, setIsgraphicCardTypeDisabled] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isGraphicCardTypeDisabled, setIsGraphicCardTypeDisabled] = useState(true);
 
   const { productFilterOptions } = useSelector(state => state?.Product) || {};
 
   const {
-    brandOptions,
     ramOptions,
     storageTypeOptions,
     storageSizeOptions,
@@ -40,16 +40,92 @@ const ProductVariantModal = () => {
 
     form.setFieldRules('graphicsCardMemorySize', [{ required: isValidValue }]);
 
-    setGraphicsCardFieldType(isValidValue ? 'select' : 'text');
-    setIsgraphicCardTypeDisabled(!isValidValue);
+    setIsGraphicCardTypeDisabled(!isValidValue);
   };
 
-  const onSubmit = values => {
-    console.log('values: ', values);
+  const onSubmit = async values => {
+    try {
+      setIsLoading(true);
+      const {
+        ramSize,
+        storageType,
+        storageSize,
+        processorName,
+        processorGen,
+        graphicsCardType,
+        graphicsCardMemorySize,
+        price,
+      } = values;
+      const payload = {
+        storage: {
+          size: storageSize?.label,
+          type: storageType?.label,
+        },
+        ram: ramSize?.label,
+        processor: {
+          name: processorName?.label,
+          generation: processorGen?.label,
+        },
+        graphicsCard: {
+          type: graphicsCardType?.label,
+          memory: graphicsCardMemorySize?.label,
+          isGraphicsCard: !!graphicsCardType?.label,
+        },
+        price: parseInt(price, 10),
+      };
+
+      let success;
+      if (!productId) {
+        success = await handleApiCall(dispatch, productsThunk.updateProductVariant, { id: variant?.id, payload });
+      } else {
+        success = await handleApiCall(dispatch, productsThunk.createProductVariant, { id: productId, payload });
+      }
+
+      if (success) {
+        closeMeAndMyParent();
+      }
+    } catch {
+      // eslint-disable-next-line no-console
+      console.log(`Error while ${variant ? 'updating' : 'creating'} variant`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     dispatch(productsThunk.getProductFilterOptions());
+  }, []);
+
+  useEffect(() => {
+    if (variant && Object.keys(variant)?.length > 0) {
+      const {
+        ram,
+        price,
+        storage: { size: storageSize, type: storageType } = {},
+        processor: { name: processorName, generation: processorGen } = {},
+        graphicsCard: { type: graphicsCardType, memory: graphicsCardMemory, isGraphicsCard } = {},
+      } = variant;
+
+      const findOption = (options, value) => options?.find(ele => ele.label === value) || { label: value, value };
+
+      const formValues = {
+        ramSize: findOption(ramOptions, ram),
+        storageType: findOption(storageTypeOptions, storageType),
+        storageSize: findOption(storageSizeOptions, storageSize),
+        processorName: findOption(processorNameOptions, processorName),
+        processorGen: findOption(processorGenOptions, processorGen),
+        price,
+      };
+
+      if (isGraphicsCard) {
+        formValues.graphicsCardType = findOption(graphicsCardTypeOptions, graphicsCardType);
+        formValues.graphicsCardMemorySize = findOption(graphicsCardMemorySizes, graphicsCardMemory);
+        setIsGraphicCardTypeDisabled(false);
+        form.setFieldRules('graphicsCardMemorySize', [{ required: true }]);
+      }
+
+      form.setFieldsValue(formValues);
+    }
   }, []);
 
   return (
@@ -58,15 +134,9 @@ const ProductVariantModal = () => {
         <Form form={form} onSubmit={onSubmit}>
           <Row className="mb-3">
             <Col>
-              <Form.Item label="Brand" type="text" name="brand" disabled placeholder="Select" options={brandOptions}>
-                <Field />
-              </Form.Item>
-            </Col>
-            <Col>
               <Form.Item
                 label="RAM Size"
-                name="ram"
-                placeholder="Select RAM Size"
+                name="ramSize"
                 type="select"
                 options={ramOptions}
                 rules={[{ required: true }]}>
@@ -77,9 +147,18 @@ const ProductVariantModal = () => {
               <Form.Item
                 label="Storage Type"
                 name="storageType"
-                placeholder="Select Storage Type"
                 type="select"
                 options={storageTypeOptions}
+                rules={[{ required: true }]}>
+                <Field />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item
+                label="Storage Size"
+                name="storageSize"
+                type="select"
+                options={storageSizeOptions}
                 rules={[{ required: true }]}>
                 <Field />
               </Form.Item>
@@ -88,21 +167,9 @@ const ProductVariantModal = () => {
           <Row className="mb-3">
             <Col>
               <Form.Item
-                label="Storage Size"
-                name="storageSize"
-                type="select"
-                placeholder="Select Storage Size"
-                options={storageSizeOptions}
-                rules={[{ required: true }]}>
-                <Field />
-              </Form.Item>
-            </Col>
-            <Col>
-              <Form.Item
                 label="Processor Name"
                 name="processorName"
                 type="select"
-                placeholder="Select Processor Name"
                 options={processorNameOptions}
                 rules={[{ required: true }]}>
                 <Field />
@@ -113,7 +180,6 @@ const ProductVariantModal = () => {
                 label="Processor Gen"
                 name="processorGen"
                 type="select"
-                placeholder="Select Processor Gen"
                 options={processorGenOptions}
                 rules={[{ required: true }]}>
                 <Field />
@@ -126,7 +192,6 @@ const ProductVariantModal = () => {
                 label="Graphics Card Type"
                 name="graphicsCardType"
                 type="select"
-                placeholder="Select Graphic Card Type"
                 options={graphicsCardTypeOptions}
                 onChange={e => onChangeGraphicCardType(e)}>
                 <Field />
@@ -136,9 +201,8 @@ const ProductVariantModal = () => {
               <Form.Item
                 label="Graphics Card Memory Size"
                 name="graphicsCardMemorySize"
-                type={graphicsCardFieldType}
-                placeholder="Select..."
-                disabled
+                type="select"
+                disabled={isGraphicCardTypeDisabled}
                 options={graphicsCardMemorySizes}>
                 <Field />
               </Form.Item>
@@ -146,15 +210,15 @@ const ProductVariantModal = () => {
           </Row>
           <Row className="mb-3">
             <Col sm={6}>
-              <Form.Item label="Price" name="price" type="number" placeholder="Price" rules={[{ required: true }]}>
+              <Form.Item label="Price" name="price" type="number" placeholder="1200" rules={[{ required: true }]}>
                 <Field />
               </Form.Item>
             </Col>
           </Row>
           <Row className="mb-3 justify-content-end">
             <Col xs="auto">
-              <Button color="primary" type="submit">
-                Update Variant
+              <Button loading={isLoading} color="primary" type="submit">
+                {productId ? 'Create' : 'Update'} Variant
               </Button>
             </Col>
           </Row>
@@ -162,6 +226,29 @@ const ProductVariantModal = () => {
       </Col>
     </Row>
   );
+};
+
+ProductVariantModal.propTypes = {
+  closeMeAndMyParent: PropTypes.func,
+  productId: PropTypes.number,
+  variant: PropTypes.shape({
+    id: PropTypes.number,
+    ram: PropTypes.string,
+    price: PropTypes.number,
+    storage: PropTypes.shape({
+      size: PropTypes.string,
+      type: PropTypes.string,
+    }),
+    processor: PropTypes.shape({
+      name: PropTypes.string,
+      generation: PropTypes.string,
+    }),
+    graphicsCard: PropTypes.shape({
+      type: PropTypes.string,
+      memory: PropTypes.string,
+      isGraphicsCard: PropTypes.bool,
+    }),
+  }),
 };
 
 export default ProductVariantModal;

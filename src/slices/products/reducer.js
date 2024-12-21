@@ -4,6 +4,7 @@ import productsThunk from './thunk';
 
 const initialState = {
   products: {},
+  advancedSearchProducts: {},
   productVariants: [],
   tableLoading: false,
   productFilterOptions: {},
@@ -25,6 +26,11 @@ const productSlice = createSlice({
       })
       .addCase(productsThunk.getAllProducts.rejected, state => {
         state.tableLoading = false;
+      })
+
+      // ADVANCED SEARCH PRODUCTS
+      .addCase(productsThunk.advancedProductSearch.fulfilled, (state, action) => {
+        state.advancedSearchProducts = action.payload;
       })
 
       // GET PRODUCT VARIANTS

@@ -9,10 +9,11 @@ import Skeleton from '@/components/Atoms/Skeleton';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
 import ProductVariantModal from '../ProductVariantModal';
 
-const ProductVariants = ({ id }) => {
+const ProductVariants = ({ closeMe, id }) => {
   const dispatch = useDispatch();
   const { productVariants } = useSelector(state => state?.Product) || [];
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedVariant, setSelectedVariant] = useState();
   const [updateVariant, setUpdateVariant] = useState(false);
 
   useEffect(() => {
@@ -117,7 +118,10 @@ const ProductVariants = ({ id }) => {
                   <td>{parseFloat(variant.price).toFixed(2)} AED</td>
                   <td className="text-center">
                     <MdOutlineModeEditOutline
-                      onClick={() => setUpdateVariant(true)}
+                      onClick={() => {
+                        setSelectedVariant(variant);
+                        setUpdateVariant(true);
+                      }}
                       style={{ cursor: 'pointer' }}
                       color="green"
                       size={19}
@@ -134,20 +138,27 @@ const ProductVariants = ({ id }) => {
         </Table>
       </Row>
 
-      {/* Advance Filter Modal */}
+      {/* Update Product Variant Modal */}
       <ModalWrapper
         isOpen={updateVariant}
         toggle={() => setUpdateVariant(false)}
         title="Update Variant"
         backdrop="static"
         isContentCentered={false}>
-        <ProductVariantModal />
+        <ProductVariantModal
+          closeMeAndMyParent={() => {
+            setUpdateVariant(false);
+            closeMe();
+          }}
+          variant={selectedVariant}
+        />
       </ModalWrapper>
     </>
   );
 };
 
 ProductVariants.propTypes = {
+  closeMe: PropTypes.func.isRequired,
   id: PropTypes.number.isRequired,
 };
 

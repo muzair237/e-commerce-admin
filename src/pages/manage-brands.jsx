@@ -111,7 +111,7 @@ const ManageBrands = () => {
   const { brands_rows, totalCount } = useMemo(
     () => ({
       brands_rows: brands?.items?.map(_ => [
-        format(new Date(_?.created_at), 'yyyy-MM-dd') || '------------',
+        format(new Date(_?.created_at), 'MMMM dd, yyyy') || '------------',
         _?.name || '------------',
         actionBtns(_),
       ]),
