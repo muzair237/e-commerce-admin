@@ -46,6 +46,8 @@ export default class Field extends Component {
         if (event !== null) {
           if (event instanceof File) {
             newValue = event;
+          } else if (Array.isArray(event)) {
+            newValue = event;
           } else if (typeof event === 'object' && 'label' in event && 'value' in event && event !== null) {
             newValue = event;
           } else if (Array.isArray(event?.target?.value) || typeof event?.target?.value === 'boolean') {

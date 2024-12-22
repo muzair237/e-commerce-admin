@@ -5,6 +5,7 @@ import { Toast } from '@/components/Molecules/Toast';
 import { Fetch } from '../../helpers/fetchWrapper';
 import {
   GET_ALL_PRODUCTS,
+  CREATE_PRODUCT,
   ADVANCED_PRODUCT_SEARCH,
   GET_PRODUCT_VARIANTS,
   GET_PRODUCT_FILTER_OPTIONS,
@@ -28,7 +29,11 @@ const productsThunk = {
     }) => {
       try {
         const res = await Fetch.get(
-          `${productsThunk.url}/${GET_ALL_PRODUCTS}?page=${page}&itemsPerPage=${itemsPerPage}&getAll=${getAll}&searchText=${searchText}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`,
+          `${
+            productsThunk.url
+          }/${GET_ALL_PRODUCTS}?page=${page}&itemsPerPage=${itemsPerPage}&getAll=${getAll}&searchText=${encodeURIComponent(
+            searchText.trim(),
+          )}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`,
         );
         if (res.status >= 200 && res.status < 300) {
           const { data } = await res.json();
@@ -43,6 +48,26 @@ const productsThunk = {
       }
     },
   ),
+
+  createProduct: createAsyncThunk('product/create-product', async ({ payload }) => {
+    try {
+      let res = await Fetch.upload(`${productsThunk.url}/${CREATE_PRODUCT}`, 'POST', payload);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Product created successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
 
   advancedProductSearch: createAsyncThunk('product/advanced-product-search', async ({ payload }) => {
     try {

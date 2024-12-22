@@ -13,6 +13,7 @@ import { Toast } from '../Toast';
 const UploadFile = ({
   isInvalid,
   multiple = false,
+  maxFiles = 1,
   accept = { 'image/jpeg': ['.jpeg', '.jpg'], 'image/png': ['.png'] },
   onChange,
   fileSize = 1,
@@ -25,8 +26,6 @@ const UploadFile = ({
     if (!files.length) {
       return;
     }
-
-    const [selectedFile] = files;
 
     if (multiple) {
       const oversizedFiles = files.filter(file => file.size / (1024 * 1024) > fileSize);
@@ -42,6 +41,7 @@ const UploadFile = ({
         return;
       }
     } else {
+      const [selectedFile] = files;
       const fileLengthMB = selectedFile.size / (1024 * 1024);
 
       if (fileLengthMB > fileSize) {
@@ -60,14 +60,22 @@ const UploadFile = ({
       preview: URL.createObjectURL(file),
       formattedSize: formatBytes(file.size),
     }));
-    onChange(selectedFile);
 
+    if (multiple) {
+      onChange(files);
+    } else {
+      onChange(files[0]);
+    }
+
+    // Update state with selected files
     setSelectedFiles(prev => {
       if (multiple) {
-        return [...prev, ...updatedFiles];
+        const totalFiles = [...prev, ...updatedFiles];
+
+        return totalFiles.slice(0, maxFiles); // Limit the number of files
       }
 
-      return updatedFiles;
+      return updatedFiles; // Just one file when not multiple
     });
   };
 
@@ -97,6 +105,7 @@ const UploadFile = ({
   return (
     <UploadFileWrapper $isInvalid={isInvalid}>
       <Dropzone
+        maxFiles={maxFiles}
         {...props}
         accept={accept}
         file
@@ -108,9 +117,13 @@ const UploadFile = ({
               <div className="mb-3">
                 <i className="display-4 text-muted ri-upload-cloud-2-fill" />
               </div>
-              <h4>Drop file here or click to upload.</h4>
-              <p className="fs-6">File must be in {getExtensions()} format. </p>
+              <h4>Drop {multiple ? 'files' : 'file'} here or click to upload.</h4>
+              <p className="fs-6">
+                File must be in {getExtensions()} format.
+                {multiple && maxFiles && <span> You can upload up to {maxFiles} files.</span>}
+              </p>
             </div>
+
             <input {...getInputProps()} />
           </div>
         )}
@@ -164,6 +177,7 @@ const UploadFile = ({
 UploadFile.propTypes = {
   isInvalid: PropTypes.bool.isRequired,
   multiple: PropTypes.bool,
+  maxFiles: PropTypes.number,
   accept: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   fileSize: PropTypes.number,

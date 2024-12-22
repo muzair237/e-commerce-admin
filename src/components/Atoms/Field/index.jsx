@@ -97,6 +97,7 @@ const Field = forwardRef(
               name={name}
               className="form-control"
               placeholder={placeholder}
+              $isInvalid={isError}
               {...props}
             />
           ) : type === 'file' ? (

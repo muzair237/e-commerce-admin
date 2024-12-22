@@ -7,9 +7,17 @@ import { handleApiCall, prepareProductFiltersData } from '@/helpers/common';
 import productsThunk from '@/slices/products/thunk';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
+import { Toast } from '@/components/Molecules/Toast';
 import Form, { useForm } from '../Form';
 
-const ProductVariantModal = ({ closeMeAndMyParent, productId, variant }) => {
+const ProductVariantModal = ({
+  type,
+  closeMeAndMyParent,
+  productId,
+  variant,
+  productVariantData,
+  setProductVariantData,
+}) => {
   const dispatch = useDispatch();
   const [form] = useForm();
   const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +82,35 @@ const ProductVariantModal = ({ closeMeAndMyParent, productId, variant }) => {
         price: parseInt(price, 10),
       };
 
+      if (type === 'createFromStart') {
+        // Check if the variant with same values (except price) already exists
+        const variantExists = productVariantData.some(
+          existingVariant =>
+            existingVariant.ram === payload.ram &&
+            existingVariant.storage.size === payload.storage.size &&
+            existingVariant.storage.type === payload.storage.type &&
+            existingVariant.processor.name === payload.processor.name &&
+            existingVariant.processor.generation === payload.processor.generation &&
+            existingVariant.graphicsCard.type === payload.graphicsCard.type &&
+            existingVariant.graphicsCard.memory === payload.graphicsCard.memory,
+        );
+
+        if (variantExists) {
+          Toast({
+            type: 'error',
+            message: 'This variant already exists (excluding price).',
+          });
+          setIsLoading(false);
+
+          return;
+        }
+
+        setProductVariantData(prev => [...prev, payload]);
+        closeMeAndMyParent();
+
+        return;
+      }
+
       let success;
       if (!productId) {
         success = await handleApiCall(dispatch, productsThunk.updateProductVariant, { id: variant?.id, payload });
@@ -93,7 +130,9 @@ const ProductVariantModal = ({ closeMeAndMyParent, productId, variant }) => {
   };
 
   useEffect(() => {
-    dispatch(productsThunk.getProductFilterOptions());
+    if (type !== 'createFromStart') {
+      dispatch(productsThunk.getProductFilterOptions());
+    }
   }, []);
 
   useEffect(() => {
@@ -218,7 +257,7 @@ const ProductVariantModal = ({ closeMeAndMyParent, productId, variant }) => {
           <Row className="mb-3 justify-content-end">
             <Col xs="auto">
               <Button loading={isLoading} color="primary" type="submit">
-                {productId ? 'Create' : 'Update'} Variant
+                {type === 'createFromStart' ? 'Create' : productId ? 'Create' : 'Update'} Variant
               </Button>
             </Col>
           </Row>
@@ -229,6 +268,7 @@ const ProductVariantModal = ({ closeMeAndMyParent, productId, variant }) => {
 };
 
 ProductVariantModal.propTypes = {
+  type: PropTypes.oneOf(['createFromStart']),
   closeMeAndMyParent: PropTypes.func,
   productId: PropTypes.number,
   variant: PropTypes.shape({
@@ -249,6 +289,8 @@ ProductVariantModal.propTypes = {
       isGraphicsCard: PropTypes.bool,
     }),
   }),
+  productVariantData: PropTypes.shape({}),
+  setProductVariantData: PropTypes.func,
 };
 
 export default ProductVariantModal;

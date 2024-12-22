@@ -21,7 +21,11 @@ const brandsThunk = {
     }) => {
       try {
         const res = await Fetch.get(
-          `${brandsThunk.url}/${GET_ALL_BRANDS}?page=${page}&itemsPerPage=${itemsPerPage}&getAll=${getAll}&searchText=${searchText}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`,
+          `${
+            brandsThunk.url
+          }/${GET_ALL_BRANDS}?page=${page}&itemsPerPage=${itemsPerPage}&getAll=${getAll}&searchText=${encodeURIComponent(
+            searchText.trim(),
+          )}&startDate=${startDate}&endDate=${endDate}&sort=${sort}`,
         );
         if (res.status >= 200 && res.status < 300) {
           const { data } = await res.json();

@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Row, Col, UncontrolledTooltip } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import { format } from 'date-fns';
+import { PiImages } from 'react-icons/pi';
+import { RiShapesFill } from 'react-icons/ri';
+import { MdOutlineModeEdit } from 'react-icons/md';
+import { VscGitPullRequestCreate } from 'react-icons/vsc';
 
 import productsThunk from '@/slices/products/thunk';
 import { prepareProductFiltersData, traverseAndModifyObject } from '@/helpers/common';
 import { manageProductsColumns } from '@/common/columns';
-import { format } from 'date-fns';
-import { PiImages } from 'react-icons/pi';
-import { VscGitPullRequestCreate } from 'react-icons/vsc';
-import { RiShapesFill } from 'react-icons/ri';
-import { MdOutlineModeEdit } from 'react-icons/md';
 import { clearAdvancedSearchProducts } from '@/slices/products/reducer';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
@@ -66,6 +66,7 @@ const AdvancedProductFilter = () => {
       await dispatch(productsThunk.advancedProductSearch({ payload }));
       setShowTable(true);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log('Error in performing advanced product search: ', error.message);
     } finally {
       setIsLoading(false);

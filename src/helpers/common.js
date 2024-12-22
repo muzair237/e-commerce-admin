@@ -103,20 +103,34 @@ export const handleApiCall = async (dispatch, action, params) => {
   }
 };
 
-export const convertToFormData = obj => {
+export const convertToFormData = data => {
   const formData = new FormData();
 
-  Object.keys(obj).forEach(key => {
-    const value = obj[key];
+  const appendData = (obj, parentKey = '') => {
+    Object.entries(obj).forEach(([key, value]) => {
+      const fullKey = parentKey ? `${parentKey}[${key}]` : key;
 
-    if (value instanceof File || value instanceof Blob) {
-      formData.append(key, value);
-    } else if (value && (typeof value === 'object' || Array.isArray(value))) {
-      formData.append(key, JSON.stringify(value));
-    } else {
-      formData.append(key, value);
-    }
-  });
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          if (item instanceof File) {
+            formData.append(`${fullKey}[${index}]`, item);
+          } else if (typeof item === 'object' && item !== null) {
+            appendData(item, `${fullKey}[${index}]`);
+          } else {
+            formData.append(`${fullKey}[${index}]`, item);
+          }
+        });
+      } else if (value instanceof File) {
+        formData.append(fullKey, value);
+      } else if (typeof value === 'object' && value !== null) {
+        appendData(value, fullKey);
+      } else {
+        formData.append(fullKey, value);
+      }
+    });
+  };
+
+  appendData(data);
 
   return formData;
 };
@@ -125,6 +139,11 @@ export const prepareProductFiltersData = (data = {}) => {
   const brandOptions = data?.brandOptions?.map(item => ({
     label: item?.name,
     value: item?.id,
+  }));
+
+  const screenSizeOptions = Object.keys(data?.screenSizes || {}).map(key => ({
+    label: data?.screenSizes[key],
+    value: key,
   }));
 
   const ramOptions = Object.keys(data?.ramOptions || {}).map(key => ({
@@ -164,6 +183,7 @@ export const prepareProductFiltersData = (data = {}) => {
 
   return {
     brandOptions,
+    screenSizeOptions,
     ramOptions,
     storageTypeOptions,
     storageSizeOptions,

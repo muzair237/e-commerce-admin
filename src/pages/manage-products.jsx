@@ -21,11 +21,13 @@ import AdvancedProductFilter from '@/components/Organisms/AdvancedProductFilters
 import ProductVariants from '@/components/Organisms/ViewProductVariantsModal';
 import ProductImages from '@/components/Organisms/ProductImagesModal';
 import ProductVariantModal from '@/components/Organisms/ProductVariantModal';
+import CreateProductModal from '@/components/Organisms/CreateProductModal';
 
 const ManageProducts = () => {
   const dispatch = useDispatch();
   const [currentProduct, setCurrentProduct] = useState({});
   const [advancedFilterModal, setAdvancedFilterModal] = useState(false);
+  const [createProductModal, setCreateProductModal] = useState(false);
   const [productVariantsModal, setProductVariantsModal] = useState(false);
   const [productImagesModal, setProductImagesModal] = useState(false);
   const [createVariantModal, setCreateVariantModal] = useState(false);
@@ -170,6 +172,7 @@ const ManageProducts = () => {
                         <Button
                           onClick={() => {
                             setCurrentProduct({});
+                            setCreateProductModal(true);
                           }}
                           type="button"
                           className="btn btn-dark add-btn"
@@ -209,6 +212,22 @@ const ManageProducts = () => {
         backdrop="static"
         isContentCentered={false}>
         <AdvancedProductFilter />
+      </ModalWrapper>
+
+      {/* Create Product Modal */}
+      <ModalWrapper
+        isOpen={createProductModal}
+        toggle={() => setCreateProductModal(false)}
+        title="Create Product"
+        size="lg"
+        backdrop="static"
+        isContentCentered={false}>
+        <CreateProductModal
+          closeMe={() => {
+            setCreateProductModal(false);
+            setRefetch(prev => !prev);
+          }}
+        />
       </ModalWrapper>
 
       {/* Product Images Modal */}
