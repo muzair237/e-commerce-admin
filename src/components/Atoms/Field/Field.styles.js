@@ -13,7 +13,7 @@ export const InputWrapper = styled.div`
 
 export const StyledInput = styled(Input)`
   position: relative;
-  border-color: ${({ $isInvalid }) => ($isInvalid ? 'red' : '')};
+  border-color: ${({ $isInvalid }) => $isInvalid && 'red !important'};
   transition: border-color 0.5s ease;
   padding-left: ${({ prefix }) => (prefix ? '30px' : '10px')};
   padding-right: ${({ suffix }) => (suffix ? '30px' : '10px')};

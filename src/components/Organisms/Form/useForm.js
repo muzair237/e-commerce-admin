@@ -259,6 +259,20 @@ class FormStore {
     this.callbacks = callbacks;
   };
 
+  resetForm = () => {
+    const initialValues = this.getFieldsValue();
+    if (initialValues) {
+      const resetValues = {};
+      Object.keys(initialValues).forEach(key => {
+        resetValues[key] = this.transformField(key, this.getInitialValue(key));
+      });
+      this.setFieldsValue(resetValues);
+    }
+    Object.keys(this.errors).forEach(key => {
+      this.removeFieldError(key);
+    });
+  };
+
   getForm = () => ({
     validateFields: this.validateFields,
     getFieldsErrors: this.getFieldsErrors,
@@ -271,6 +285,7 @@ class FormStore {
     setFieldRules: this.setFieldRules,
     hasFieldError: this.hasFieldError,
     removeFieldError: this.removeFieldError,
+    resetForm: this.resetForm,
     submit: this.submit,
     getInternalHooks: () => ({
       setInitialValues: this.setInitialValues,

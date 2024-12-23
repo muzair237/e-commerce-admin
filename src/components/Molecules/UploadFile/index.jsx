@@ -67,15 +67,14 @@ const UploadFile = ({
       onChange(files[0]);
     }
 
-    // Update state with selected files
     setSelectedFiles(prev => {
       if (multiple) {
         const totalFiles = [...prev, ...updatedFiles];
 
-        return totalFiles.slice(0, maxFiles); // Limit the number of files
+        return totalFiles.slice(0, maxFiles);
       }
 
-      return updatedFiles; // Just one file when not multiple
+      return updatedFiles;
     });
   };
 
@@ -86,25 +85,39 @@ const UploadFile = ({
       .replace(/, ([^,]*)$/, ' and $1');
 
   const handleDelete = fileToDelete => {
-    setSelectedFiles(prevFiles => prevFiles.filter(file => file.preview !== fileToDelete.preview));
-    onChange(null);
+    setSelectedFiles(prevFiles => {
+      const updatedFiles = prevFiles.filter(file => file.preview !== fileToDelete.preview);
+
+      onChange(updatedFiles.length > 0 ? updatedFiles : null);
+
+      return updatedFiles;
+    });
   };
 
   useEffect(() => {
     if (displayFile) {
-      const newFile = {
-        name: displayFile.split('/').pop(),
-        preview: displayFile,
-        formattedSize: 'N/A',
-      };
+      const newFiles = multiple
+        ? displayFile.map(file => ({
+            name: file.split('/').pop(),
+            preview: file,
+            formattedSize: 'N/A',
+          }))
+        : [
+            {
+              name: displayFile.split('/').pop(),
+              preview: displayFile,
+              formattedSize: 'N/A',
+            },
+          ];
 
-      setSelectedFiles([newFile]);
+      setSelectedFiles(newFiles);
     }
-  }, [displayFile]);
+  }, [displayFile, multiple]);
 
   return (
-    <UploadFileWrapper $isInvalid={isInvalid}>
+    <UploadFileWrapper $shouldPoint={selectedFiles.length < maxFiles} $isInvalid={isInvalid}>
       <Dropzone
+        disabled={selectedFiles.length >= maxFiles}
         maxFiles={maxFiles}
         {...props}
         accept={accept}
@@ -120,7 +133,7 @@ const UploadFile = ({
               <h4>Drop {multiple ? 'files' : 'file'} here or click to upload.</h4>
               <p className="fs-6">
                 File must be in {getExtensions()} format.
-                {multiple && maxFiles && <span> You can upload up to {maxFiles} files.</span>}
+                {multiple && !!maxFiles && <span> You can upload up to {maxFiles} files.</span>}
               </p>
             </div>
 

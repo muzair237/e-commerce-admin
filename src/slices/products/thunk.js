@@ -6,11 +6,13 @@ import { Fetch } from '../../helpers/fetchWrapper';
 import {
   GET_ALL_PRODUCTS,
   CREATE_PRODUCT,
+  UPDATE_PRODUCT,
   ADVANCED_PRODUCT_SEARCH,
   GET_PRODUCT_VARIANTS,
   GET_PRODUCT_FILTER_OPTIONS,
   CREATE_PRODUCT_VARIANT,
   UPDATE_PRODUCT_VARIANT,
+  DELETE_PRODUCT_VARIANT,
 } from '../../helpers/url_helper';
 
 const productsThunk = {
@@ -57,6 +59,26 @@ const productsThunk = {
         Toast({
           type: 'success',
           message: 'Product created successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
+  updateProduct: createAsyncThunk('product/update-product', async ({ id, payload }) => {
+    try {
+      let res = await Fetch.upload(`${productsThunk.url}/${UPDATE_PRODUCT}/${id}`, 'PUT', payload);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Product updated successfully!',
         });
 
         return res;
@@ -145,6 +167,26 @@ const productsThunk = {
         Toast({
           type: 'success',
           message: 'Variant updated successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
+  deleteProductVariant: createAsyncThunk('product/delete-product-variant', async ({ id }) => {
+    try {
+      let res = await Fetch.delete(`${productsThunk.url}/${DELETE_PRODUCT_VARIANT}/${id}`);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Variant deleted successfully!',
         });
 
         return res;

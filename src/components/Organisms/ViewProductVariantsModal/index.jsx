@@ -4,9 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Row, Table, UncontrolledTooltip } from 'reactstrap';
 
 import productsThunk from '@/slices/products/thunk';
-import { MdOutlineModeEditOutline } from 'react-icons/md';
+import { MdOutlineModeEditOutline, MdDeleteOutline } from 'react-icons/md';
+import { handleApiCall } from '@/helpers/common';
 import Skeleton from '@/components/Atoms/Skeleton';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
+import ConfirmationModal from '@/components/Molecules/ConfirmationModal';
 import ProductVariantModal from '../ProductVariantModal';
 
 const ProductVariants = ({ closeMe, id }) => {
@@ -14,7 +16,25 @@ const ProductVariants = ({ closeMe, id }) => {
   const { productVariants } = useSelector(state => state?.Product) || [];
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState();
-  const [updateVariant, setUpdateVariant] = useState(false);
+  const [updateVariantModal, setUpdateVariantModal] = useState(false);
+  const [deleteVariantModal, setDeleteVariantModal] = useState(false);
+
+  const handleDeleteVariant = async () => {
+    try {
+      setIsLoading(true);
+      const success = await handleApiCall(dispatch, productsThunk.deleteProductVariant, { id: selectedVariant?.id });
+
+      if (success) {
+        setDeleteVariantModal(false);
+        setSelectedVariant(null);
+        closeMe();
+      }
+    } catch ({ message }) {
+      console.error('Error deleting variant: ', message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchProductVariants = async () => {
@@ -22,6 +42,7 @@ const ProductVariants = ({ closeMe, id }) => {
         setIsLoading(true);
         await dispatch(productsThunk.getProductVariants({ id }));
       } catch ({ message }) {
+        // eslint-disable-next-line no-console
         console.log('Error occurred while fetching product variants: ', message);
       } finally {
         setIsLoading(false);
@@ -47,7 +68,9 @@ const ProductVariants = ({ closeMe, id }) => {
               <th scope="col">Graphics Card</th>
               <th scope="col">Graphics Card Memory Size</th>
               <th scope="col">Price</th>
-              <th scope="col">Actions</th>
+              <th colSpan="2" scope="col">
+                Actions
+              </th>
             </tr>
             <tr>
               <th scope="col" />
@@ -60,12 +83,13 @@ const ProductVariants = ({ closeMe, id }) => {
               <th scope="col" />
               <th scope="col" />
               <th scope="col" />
+              <th scope="col" />
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              Array.from({ length: 8 }).map((_, index) => (
-                <tr key={index}>
+              Array.from({ length: 8 }).map(_ => (
+                <tr key={_}>
                   <th scope="row">
                     <Skeleton height="20px" width="30px" />
                   </th>
@@ -120,7 +144,7 @@ const ProductVariants = ({ closeMe, id }) => {
                     <MdOutlineModeEditOutline
                       onClick={() => {
                         setSelectedVariant(variant);
-                        setUpdateVariant(true);
+                        setUpdateVariantModal(true);
                       }}
                       style={{ cursor: 'pointer' }}
                       color="green"
@@ -129,6 +153,21 @@ const ProductVariants = ({ closeMe, id }) => {
                     />
                     <UncontrolledTooltip placement="top" target="editVariant">
                       Edit Variant
+                    </UncontrolledTooltip>
+                  </td>
+                  <td className="text-center">
+                    <MdDeleteOutline
+                      onClick={() => {
+                        setSelectedVariant(variant);
+                        setDeleteVariantModal(true);
+                      }}
+                      style={{ cursor: 'pointer' }}
+                      color="red"
+                      size={19}
+                      id="deleteVariant"
+                    />
+                    <UncontrolledTooltip placement="top" target="deleteVariant">
+                      Delete Variant
                     </UncontrolledTooltip>
                   </td>
                 </tr>
@@ -140,17 +179,32 @@ const ProductVariants = ({ closeMe, id }) => {
 
       {/* Update Product Variant Modal */}
       <ModalWrapper
-        isOpen={updateVariant}
-        toggle={() => setUpdateVariant(false)}
+        isOpen={updateVariantModal}
+        toggle={() => setUpdateVariantModal(false)}
         title="Update Variant"
         backdrop="static"
         isContentCentered={false}>
         <ProductVariantModal
           closeMeAndMyParent={() => {
-            setUpdateVariant(false);
+            setUpdateVariantModal(false);
             closeMe();
           }}
           variant={selectedVariant}
+        />
+      </ModalWrapper>
+
+      {/* Delete Variant Modal */}
+      <ModalWrapper
+        isOpen={deleteVariantModal}
+        toggle={() => setDeleteVariantModal(false)}
+        title="Delete Variant"
+        backdrop="static"
+        isContentCentered={false}>
+        <ConfirmationModal
+          type="delete"
+          message="Are you sure you want to delete this variant?"
+          isLoading={isLoading}
+          handleClick={handleDeleteVariant}
         />
       </ModalWrapper>
     </>

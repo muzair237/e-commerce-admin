@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { Row, Col } from 'reactstrap';
 
@@ -10,13 +11,15 @@ import Button from '@/components/Atoms/Button';
 import Form, { useForm } from '../Form';
 import ProductVariantModal from '../ProductVariantModal';
 
-const CreateProductModal = ({ closeMe }) => {
+const CreateProductModal = ({ product, closeMe }) => {
   const dispatch = useDispatch();
   const [form] = useForm();
+  const { images } = product;
   const [isLoading, setIsLoading] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState({});
   const [productVariantData, setProductVariantData] = useState([]);
   const [productVariantModal, setProductVariantModal] = useState(false);
+  const [currentVariantNumber, setCurrentVariantNumber] = useState(false);
 
   const { productFilterOptions } = useSelector(state => state?.Product) || {};
 
@@ -30,25 +33,32 @@ const CreateProductModal = ({ closeMe }) => {
 
       const productPayload = {
         ...traverseAndModifyObject(rest),
-        name: rest?.model, // ensure model exists in rest
+        name: rest?.model,
         brandId: rest.brandId?.value,
-        images: images || [], // ensures an empty array if no images
+        images: images || [],
       };
 
-      const payload = convertToFormData({
-        product: productPayload,
-        variations: productVariantData,
-      });
-      console.log('payload: ', payload);
-
-      const success = await handleApiCall(dispatch, productsThunk.createProduct, {
-        payload,
-      });
+      let success;
+      if (Object.keys(product)?.length > 0) {
+        const formData = convertToFormData(productPayload);
+        success = await handleApiCall(dispatch, productsThunk.updateProduct, {
+          id: product?.id,
+          payload: formData,
+        });
+      } else {
+        success = await handleApiCall(dispatch, productsThunk.createProduct, {
+          ...convertToFormData({
+            product: productPayload,
+            variations: productVariantData,
+          }),
+        });
+      }
 
       if (success) {
         closeMe();
       }
     } catch ({ message }) {
+      // eslint-disable-next-line no-console
       console.log('Error in creating product: ', message);
     } finally {
       setIsLoading(false);
@@ -59,7 +69,17 @@ const CreateProductModal = ({ closeMe }) => {
     dispatch(productsThunk.getProductFilterOptions());
   }, []);
 
-  console.log('productVariants: ', productVariantData);
+  useEffect(() => {
+    if (Object.keys(product)?.length > 0) {
+      form.setFieldsValue({
+        model: product?.model,
+        brandId: brandOptions?.find(ele => ele?.value === product?.brandId),
+        images: product?.images,
+        screenSize: screenSizeOptions?.find(ele => ele?.label === product?.screenSize),
+        description: product?.description,
+      });
+    }
+  }, [brandOptions, screenSizeOptions]);
 
   return (
     <>
@@ -107,6 +127,7 @@ const CreateProductModal = ({ closeMe }) => {
                 placeholder="Select Product Images"
                 multiple
                 maxFiles={4}
+                displayFile={images || null}
                 type="file"
                 options={screenSizeOptions}
                 rules={[{ required: true }]}>
@@ -133,6 +154,7 @@ const CreateProductModal = ({ closeMe }) => {
                   <Col key={ele} xs="auto">
                     <Button
                       onClick={() => {
+                        setCurrentVariantNumber(index);
                         setSelectedVariant(ele);
                         setProductVariantModal(true);
                       }}
@@ -144,20 +166,23 @@ const CreateProductModal = ({ closeMe }) => {
               </Row>
             )}
             <Row className="mb-3 justify-content-between">
-              <Col>
-                <Button
-                  onClick={() => {
-                    setSelectedVariant({});
-                    setProductVariantModal(true);
-                  }}
-                  type="button"
-                  color="danger">
-                  Add Variant
-                </Button>
-              </Col>
+              {!Object.keys(product)?.length > 0 && (
+                <Col>
+                  <Button
+                    onClick={() => {
+                      setCurrentVariantNumber();
+                      setSelectedVariant({});
+                      setProductVariantModal(true);
+                    }}
+                    type="button"
+                    color="danger">
+                    Add Variant
+                  </Button>
+                </Col>
+              )}
               <Col className="text-end">
                 <Button type="submit" loading={isLoading} color="primary">
-                  Create Product
+                  {Object.keys(product)?.length > 0 ? 'Update Product' : 'Create Product'}
                 </Button>
               </Col>
             </Row>
@@ -181,10 +206,16 @@ const CreateProductModal = ({ closeMe }) => {
           }}
           productVariantData={productVariantData}
           setProductVariantData={setProductVariantData}
+          modifyExisting={currentVariantNumber}
         />
       </ModalWrapper>
     </>
   );
+};
+
+CreateProductModal.propTypes = {
+  product: PropTypes.shape({}),
+  closeMe: PropTypes.func.isRequired,
 };
 
 export default CreateProductModal;

@@ -13,11 +13,13 @@ export const UPDATE_BRAND = 'update-brand';
 // MANAGE PRODUCTS ENDPOINT(S)
 export const GET_ALL_PRODUCTS = 'get-all-products';
 export const CREATE_PRODUCT = 'create-product';
+export const UPDATE_PRODUCT = 'update-product';
 export const ADVANCED_PRODUCT_SEARCH = 'advanced-product-search';
 export const GET_PRODUCT_FILTER_OPTIONS = 'get-product-filter-options';
 export const GET_PRODUCT_VARIANTS = 'get-product-variants';
 export const CREATE_PRODUCT_VARIANT = 'create-product-variant';
 export const UPDATE_PRODUCT_VARIANT = 'update-product-variant';
+export const DELETE_PRODUCT_VARIANT = 'delete-product-variant';
 
 // PERMISSIONS ENDPOINT(S)
 export const GET_ALL_PERMISSIONS = 'get-all-permissions';

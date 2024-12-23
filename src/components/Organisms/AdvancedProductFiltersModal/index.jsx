@@ -14,6 +14,7 @@ import { clearAdvancedSearchProducts } from '@/slices/products/reducer';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
 import TableContainer from '@/components/Common/TableContainer';
+import { Toast } from '@/components/Molecules/Toast';
 import Form, { useForm } from '../Form';
 
 const AdvancedProductFilter = () => {
@@ -162,10 +163,19 @@ const AdvancedProductFilter = () => {
   );
 
   const clearAllFilters = () => {
+    setShowTable(false);
+    setIsFirstRender(true);
+    dispatch(clearAdvancedSearchProducts());
     setPaginationFilters({
       page: 1,
       itemsPerPage: 2,
       getAll: false,
+    });
+    form.resetForm();
+
+    Toast({
+      type: 'success',
+      message: 'Filters cleared successfully!',
     });
   };
 
@@ -295,12 +305,13 @@ const AdvancedProductFilter = () => {
               </Col>
             </Row>
             <Row className="mb-3 justify-content-end">
-              {/* Show below button only when filters are applied */}
-              <Col xs="auto">
-                <Button onClick={clearAllFilters} color="danger" type="button">
-                  Clear All Filters
-                </Button>
-              </Col>
+              {showTable && (
+                <Col xs="auto">
+                  <Button onClick={clearAllFilters} color="danger" type="button">
+                    Clear All Filters
+                  </Button>
+                </Col>
+              )}
               <Col xs="auto">
                 <Button loading={isLoading} color="primary" type="submit">
                   Search Products

@@ -1,4 +1,9 @@
+/* eslint-disable react/jsx-filename-extension */
+import React from 'react';
 import { useSelector } from 'react-redux';
+import { AiOutlineDelete } from 'react-icons/ai';
+import { IoIosInformationCircleOutline } from 'react-icons/io';
+
 import { Toast } from '@/components/Molecules/Toast';
 
 export const GetCurrentAppearanceState = () => {
@@ -206,4 +211,16 @@ export const traverseAndModifyObject = (obj = {}) => {
   });
 
   return result;
+};
+
+export const getNestedValue = (obj, path) => path.split('.').reduce((acc, key) => acc?.[key], obj);
+
+export const giveIcon = ({ type }) => {
+  const iconSize = 70;
+  switch (type) {
+    case 'delete':
+      return <AiOutlineDelete color="red" size={iconSize} />;
+    default:
+      return <IoIosInformationCircleOutline color="pink" size={iconSize} />;
+  }
 };

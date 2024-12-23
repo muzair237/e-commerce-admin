@@ -27,7 +27,7 @@ const ManageProducts = () => {
   const dispatch = useDispatch();
   const [currentProduct, setCurrentProduct] = useState({});
   const [advancedFilterModal, setAdvancedFilterModal] = useState(false);
-  const [createProductModal, setCreateProductModal] = useState(false);
+  const [productModal, setProductModal] = useState(false);
   const [productVariantsModal, setProductVariantsModal] = useState(false);
   const [productImagesModal, setProductImagesModal] = useState(false);
   const [createVariantModal, setCreateVariantModal] = useState(false);
@@ -101,14 +101,15 @@ const ManageProducts = () => {
         <MdOutlineModeEdit
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            setCurrentProduct({ id: _?.id, name: _?.name, logo: _?.logo });
+            setCurrentProduct(_);
+            setProductModal(true);
           }}
           color="green"
           size={19}
           id="edit"
         />
         <UncontrolledTooltip placement="top" target="edit">
-          Edit
+          Edit Product
         </UncontrolledTooltip>
       </div>
     </div>
@@ -172,7 +173,7 @@ const ManageProducts = () => {
                         <Button
                           onClick={() => {
                             setCurrentProduct({});
-                            setCreateProductModal(true);
+                            setProductModal(true);
                           }}
                           type="button"
                           className="btn btn-dark add-btn"
@@ -214,17 +215,18 @@ const ManageProducts = () => {
         <AdvancedProductFilter />
       </ModalWrapper>
 
-      {/* Create Product Modal */}
+      {/* Product Modal */}
       <ModalWrapper
-        isOpen={createProductModal}
-        toggle={() => setCreateProductModal(false)}
-        title="Create Product"
+        isOpen={productModal}
+        toggle={() => setProductModal(false)}
+        title={Object.keys(currentProduct)?.length > 0 ? `Update ${currentProduct?.name}` : 'Create Product'}
         size="lg"
         backdrop="static"
         isContentCentered={false}>
         <CreateProductModal
+          product={currentProduct}
           closeMe={() => {
-            setCreateProductModal(false);
+            setProductModal(false);
             setRefetch(prev => !prev);
           }}
         />
@@ -249,7 +251,13 @@ const ManageProducts = () => {
         size="xl"
         backdrop="static"
         isContentCentered={false}>
-        <ProductVariants closeMe={() => setProductVariantsModal(false)} id={currentProduct?.id} />
+        <ProductVariants
+          closeMe={() => {
+            setProductVariantsModal(false);
+            setRefetch(prev => !prev);
+          }}
+          id={currentProduct?.id}
+        />
       </ModalWrapper>
 
       {/* Update Product Variant Modal */}

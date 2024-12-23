@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { Col, Row } from 'reactstrap';
 
-import { handleApiCall, prepareProductFiltersData } from '@/helpers/common';
+import { getNestedValue, handleApiCall, prepareProductFiltersData } from '@/helpers/common';
 import productsThunk from '@/slices/products/thunk';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
@@ -17,6 +17,7 @@ const ProductVariantModal = ({
   variant,
   productVariantData,
   setProductVariantData,
+  modifyExisting,
 }) => {
   const dispatch = useDispatch();
   const [form] = useForm();
@@ -83,30 +84,44 @@ const ProductVariantModal = ({
       };
 
       if (type === 'createFromStart') {
-        // Check if the variant with same values (except price) already exists
-        const variantExists = productVariantData.some(
-          existingVariant =>
-            existingVariant.ram === payload.ram &&
-            existingVariant.storage.size === payload.storage.size &&
-            existingVariant.storage.type === payload.storage.type &&
-            existingVariant.processor.name === payload.processor.name &&
-            existingVariant.processor.generation === payload.processor.generation &&
-            existingVariant.graphicsCard.type === payload.graphicsCard.type &&
-            existingVariant.graphicsCard.memory === payload.graphicsCard.memory,
-        );
+        const isUpdating = typeof modifyExisting === 'number';
 
-        if (variantExists) {
+        // Check if the variant already exists (ignoring price in both cases)
+        const variantExistsIndex = productVariantData.findIndex((variant, index) => {
+          const isDuplicate = [
+            'ram',
+            'storage.size',
+            'storage.type',
+            'processor.name',
+            'processor.generation',
+            'graphicsCard.type',
+            'graphicsCard.memory',
+          ].every(key => getNestedValue(variant, key) === getNestedValue(payload, key));
+
+          return isUpdating ? isDuplicate && index !== modifyExisting : isDuplicate; // Skip the current index if updating
+        });
+
+        // If a match is found, show a toast message and exit
+        if (variantExistsIndex !== -1) {
           Toast({
             type: 'error',
-            message: 'This variant already exists (excluding price).',
+            message: `This variant matches Variant ${variantExistsIndex + 1}.`,
           });
           setIsLoading(false);
 
           return;
         }
 
-        setProductVariantData(prev => [...prev, payload]);
+        // Add or Update the variant
+        setProductVariantData(prev => {
+          const updatedVariants = [...prev];
+          isUpdating ? (updatedVariants[modifyExisting] = payload) : updatedVariants.push(payload);
+
+          return updatedVariants;
+        });
+
         closeMeAndMyParent();
+        setIsLoading(false);
 
         return;
       }
@@ -291,6 +306,7 @@ ProductVariantModal.propTypes = {
   }),
   productVariantData: PropTypes.shape({}),
   setProductVariantData: PropTypes.func,
+  modifyExisting: PropTypes.number,
 };
 
 export default ProductVariantModal;

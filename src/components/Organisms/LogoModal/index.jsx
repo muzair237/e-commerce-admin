@@ -30,7 +30,12 @@ const LogoModal = ({ currentLogo, isLoading, handleClick }) => {
           </div>
         </Col>
         <div className="mb-3">
-          <Form.Item label="Upload Logo" type="file" name="logo" displayFile={logo} rules={[{ required: true }]}>
+          <Form.Item
+            label="Upload Logo"
+            type="file"
+            name="logo"
+            displayFile={logo || null}
+            rules={[{ required: true }]}>
             <Field />
           </Form.Item>
         </div>
