@@ -224,3 +224,7 @@ export const giveIcon = ({ type }) => {
       return <IoIosInformationCircleOutline color="pink" size={iconSize} />;
   }
 };
+
+export const isObjectEmptyOrFieldsNull = obj =>
+  Object.keys(obj)?.length <= 0 ||
+  Object.values(obj).every(value => value === null || value === undefined || value === '');

@@ -5,6 +5,7 @@ import { Col, Row } from 'reactstrap';
 
 import { getNestedValue, handleApiCall, prepareProductFiltersData } from '@/helpers/common';
 import productsThunk from '@/slices/products/thunk';
+import { amountRegex } from '@/helpers/regexes';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
 import { Toast } from '@/components/Molecules/Toast';
@@ -264,7 +265,18 @@ const ProductVariantModal = ({
           </Row>
           <Row className="mb-3">
             <Col sm={6}>
-              <Form.Item label="Price" name="price" type="number" placeholder="1200" rules={[{ required: true }]}>
+              <Form.Item
+                label="Price"
+                name="price"
+                type="number"
+                placeholder="1200"
+                rules={[
+                  { required: true },
+                  {
+                    pattern: amountRegex,
+                    message: 'Enter a positive number greater than 0 with up to 2 decimal places.',
+                  },
+                ]}>
                 <Field />
               </Form.Item>
             </Col>

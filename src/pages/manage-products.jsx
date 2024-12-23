@@ -21,7 +21,7 @@ import AdvancedProductFilter from '@/components/Organisms/AdvancedProductFilters
 import ProductVariants from '@/components/Organisms/ViewProductVariantsModal';
 import ProductImages from '@/components/Organisms/ProductImagesModal';
 import ProductVariantModal from '@/components/Organisms/ProductVariantModal';
-import CreateProductModal from '@/components/Organisms/CreateProductModal';
+import CreateProductModal from '@/components/Organisms/ProductModal';
 
 const ManageProducts = () => {
   const dispatch = useDispatch();

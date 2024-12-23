@@ -13,7 +13,7 @@ import { handleApiCall, convertToFormData } from '@/helpers/common';
 import BreadCrumb from '@/components/Common/BreadCrumb';
 import TableContainer from '@/components/Common/TableContainer';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
-import LogoModal from '@/components/Organisms/LogoModal';
+import BrandModal from '@/components/Organisms/BrandModal';
 import Anchor from '@/components/Molecules/Anchor';
 import Button from '@/components/Atoms/Button';
 import withAuthProtection from '@/components/Common/withAuthProtection';
@@ -21,7 +21,7 @@ import withAuthProtection from '@/components/Common/withAuthProtection';
 const ManageBrands = () => {
   const dispatch = useDispatch();
   const [currentLogo, setCurrentLogo] = useState({});
-  const [logoModal, setLogoModal] = useState(false);
+  const [brandModal, setBrandModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { brands } = useSelector(state => state?.Brand) || {};
   const { tableLoading } = useSelector(state => state?.Brand) || false;
@@ -66,7 +66,7 @@ const ManageBrands = () => {
       }
 
       if (success) {
-        setLogoModal(false);
+        setBrandModal(false);
         setRefetch(prev => !prev);
       }
     } finally {
@@ -95,7 +95,7 @@ const ManageBrands = () => {
           style={{ cursor: 'pointer' }}
           onClick={() => {
             setCurrentLogo({ id: _?.id, name: _?.name, logo: _?.logo });
-            setLogoModal(true);
+            setBrandModal(true);
           }}
           color="green"
           size={19}
@@ -133,13 +133,13 @@ const ManageBrands = () => {
 
       {/* Logo Modal */}
       <ModalWrapper
-        isOpen={logoModal}
-        toggle={() => setLogoModal(false)}
-        title={currentLogo?.name?.toUpperCase() || 'Create Brand'}
+        isOpen={brandModal}
+        toggle={() => setBrandModal(false)}
+        title={Object.keys(currentLogo)?.length > 0 ? `Update ${currentLogo?.name}` : 'Create Brand'}
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <LogoModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleBrand} />
+        <BrandModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleBrand} />
       </ModalWrapper>
 
       <div className="page-content">
@@ -160,7 +160,7 @@ const ManageBrands = () => {
                         <Button
                           onClick={() => {
                             setCurrentLogo({});
-                            setLogoModal(true);
+                            setBrandModal(true);
                           }}
                           type="button"
                           className="btn btn-dark add-btn"

@@ -98,15 +98,13 @@ const UploadFile = ({
     if (displayFile) {
       const newFiles = multiple
         ? displayFile.map(file => ({
-            name: file.split('/').pop(),
+            name: 'Tap to preview',
             preview: file,
-            formattedSize: 'N/A',
           }))
         : [
             {
-              name: displayFile.split('/').pop(),
+              name: 'Tap to preview',
               preview: displayFile,
-              formattedSize: 'N/A',
             },
           ];
 

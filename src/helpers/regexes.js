@@ -1,0 +1,10 @@
+export const alphaNumericRegex = /^[A-Za-z0-9]+$/;
+export const addressRegex = /^[\p{L}0-9\s.,'’\-#/\\&()áéíóúçãàèìòùâêîôûäëïöüÿ]+$/u;
+export const alphaSpaceRegex = /^[a-zA-Z\s]+$/;
+export const percentageWithDecimalsRegex = /^(100(\.0{1,3})?|[1-9]?[0-9](\.\d{1,3})?)$/;
+export const alphaNumericWithSpacesAndHyphens = /^[A-Za-z0-9\s-]+$/;
+export const IBANRegex = /^[A-Z]{2}\d{2}(\s?[A-Z0-9]){1,30}$/;
+export const amountRegex = /^(?!0(?:\.0{1,2})?$)(?:[1-9]\d*(?:\.\d{1,2})?|0?\.\d{1,2})$/;
+export const labelRegex = /^[a-zA-Z0-9\s\-.,'/&()]+$/;
+export const digitsAndHyphenRegex = /^[0-9]+(?:-[0-9]+)*$/;
+export const exactLength = length => new RegExp(`^\\d{${length}}$`);

@@ -11,7 +11,7 @@ import Button from '@/components/Atoms/Button';
 import Form, { useForm } from '../Form';
 import ProductVariantModal from '../ProductVariantModal';
 
-const CreateProductModal = ({ product, closeMe }) => {
+const ProductModal = ({ product, closeMe }) => {
   const dispatch = useDispatch();
   const [form] = useForm();
   const { images } = product;
@@ -47,7 +47,7 @@ const CreateProductModal = ({ product, closeMe }) => {
         });
       } else {
         success = await handleApiCall(dispatch, productsThunk.createProduct, {
-          ...convertToFormData({
+          payload: convertToFormData({
             product: productPayload,
             variations: productVariantData,
           }),
@@ -213,9 +213,9 @@ const CreateProductModal = ({ product, closeMe }) => {
   );
 };
 
-CreateProductModal.propTypes = {
+ProductModal.propTypes = {
   product: PropTypes.shape({}),
   closeMe: PropTypes.func.isRequired,
 };
 
-export default CreateProductModal;
+export default ProductModal;

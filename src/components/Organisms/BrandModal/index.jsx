@@ -6,7 +6,7 @@ import Field from '@/components/Atoms/Field';
 import Form from '@/components/Organisms/Form/Form';
 import Button from '@/components/Atoms/Button';
 
-const LogoModal = ({ currentLogo, isLoading, handleClick }) => {
+const BrandModal = ({ currentLogo, isLoading, handleClick }) => {
   const { name, logo } = currentLogo;
   const [form] = useForm();
 
@@ -41,7 +41,7 @@ const LogoModal = ({ currentLogo, isLoading, handleClick }) => {
         </div>
         <div className="mb-3">
           <Button loading={isLoading} color="primary" type="submit" className="w-100">
-            Submit
+            {Object.keys(currentLogo)?.length > 0 ? 'Update Brand' : 'Create Brand'}
           </Button>
         </div>
       </Row>
@@ -49,7 +49,7 @@ const LogoModal = ({ currentLogo, isLoading, handleClick }) => {
   );
 };
 
-LogoModal.propTypes = {
+BrandModal.propTypes = {
   handleClick: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
   currentLogo: PropTypes.shape({
@@ -58,4 +58,4 @@ LogoModal.propTypes = {
   }),
 };
 
-export default LogoModal;
+export default BrandModal;

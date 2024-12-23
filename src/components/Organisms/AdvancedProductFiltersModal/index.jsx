@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useContextHook } from 'use-context-hook';
 import { Row, Col, UncontrolledTooltip } from 'reactstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { format } from 'date-fns';
@@ -8,27 +9,41 @@ import { MdOutlineModeEdit } from 'react-icons/md';
 import { VscGitPullRequestCreate } from 'react-icons/vsc';
 
 import productsThunk from '@/slices/products/thunk';
-import { prepareProductFiltersData, traverseAndModifyObject } from '@/helpers/common';
+import { isObjectEmptyOrFieldsNull, prepareProductFiltersData, traverseAndModifyObject } from '@/helpers/common';
 import { manageProductsColumns } from '@/common/columns';
 import { clearAdvancedSearchProducts } from '@/slices/products/reducer';
+import { UtilsContext } from '@/contexts/utilsContext';
+import { amountRegex } from '@/helpers/regexes';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
 import TableContainer from '@/components/Common/TableContainer';
 import { Toast } from '@/components/Molecules/Toast';
+import ModalWrapper from '@/components/Molecules/ModalWrapper';
 import Form, { useForm } from '../Form';
+import ProductVariantModal from '../ProductVariantModal';
+import ProductVariants from '../ViewProductVariantsModal';
+import ProductImages from '../ProductImagesModal';
+import CreateProductModal from '../ProductModal';
 
 const AdvancedProductFilter = () => {
   const dispatch = useDispatch();
   const [form] = useForm();
+  const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
+  const [currentProduct, setCurrentProduct] = useState({});
   const [paginationFilters, setPaginationFilters] = useState({
     page: 1,
-    itemsPerPage: 2,
+    itemsPerPage: 3,
     getAll: false,
   });
+  const [isInteracted, setIsInteracted] = useState({});
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [showTable, setShowTable] = useState(false);
   const [allFilters, setAllFilters] = useState({});
+  const [productModal, setProductModal] = useState(false);
+  const [productVariantsModal, setProductVariantsModal] = useState(false);
+  const [productImagesModal, setProductImagesModal] = useState(false);
+  const [createVariantModal, setCreateVariantModal] = useState(false);
 
   const { productFilterOptions } = useSelector(state => state?.Product) || {};
   const { advancedSearchProducts } = useSelector(state => state?.Product) || {};
@@ -87,10 +102,10 @@ const AdvancedProductFilter = () => {
       <div className="viewImages">
         <PiImages
           style={{ cursor: 'pointer' }}
-          // onClick={() => {
-          //   setCurrentProduct({ model: _?.model, images: _?.images });
-          //   setProductImagesModal(true);
-          // }}
+          onClick={() => {
+            setCurrentProduct({ model: _?.model, images: _?.images });
+            setProductImagesModal(true);
+          }}
           color="#007BFF"
           size={19}
           id="viewImages"
@@ -103,8 +118,8 @@ const AdvancedProductFilter = () => {
         <VscGitPullRequestCreate
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            // setCurrentProduct({ id: _?.id });
-            // setCreateVariantModal(true);
+            setCurrentProduct({ id: _?.id });
+            setCreateVariantModal(true);
           }}
           color="#007BFF"
           size={19}
@@ -118,8 +133,8 @@ const AdvancedProductFilter = () => {
         <RiShapesFill
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            // setCurrentProduct({ id: _?.id, model: _?.model });
-            // setProductVariantsModal(true);
+            setCurrentProduct({ id: _?.id, model: _?.model });
+            setProductVariantsModal(true);
           }}
           color="#007BFF"
           size={19}
@@ -133,14 +148,15 @@ const AdvancedProductFilter = () => {
         <MdOutlineModeEdit
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            // setCurrentProduct({ id: _?.id, name: _?.name, logo: _?.logo });
+            setCurrentProduct(_);
+            setProductModal(true);
           }}
           color="green"
           size={19}
           id="edit"
         />
         <UncontrolledTooltip placement="top" target="edit">
-          Edit
+          Edit Product
         </UncontrolledTooltip>
       </div>
     </div>
@@ -164,11 +180,12 @@ const AdvancedProductFilter = () => {
 
   const clearAllFilters = () => {
     setShowTable(false);
+    setIsInteracted({});
     setIsFirstRender(true);
     dispatch(clearAdvancedSearchProducts());
     setPaginationFilters({
       page: 1,
-      itemsPerPage: 2,
+      itemsPerPage: 3,
       getAll: false,
     });
     form.resetForm();
@@ -187,7 +204,7 @@ const AdvancedProductFilter = () => {
       return;
     }
     onSubmit(allFilters);
-  }, [paginationFilters]);
+  }, [paginationFilters, refetch]);
 
   return (
     <>
@@ -198,11 +215,12 @@ const AdvancedProductFilter = () => {
             onSubmit={values => {
               setPaginationFilters({
                 page: 1,
-                itemsPerPage: 2,
+                itemsPerPage: 3,
                 getAll: false,
               });
               onSubmit(values);
-            }}>
+            }}
+            onTouched={_ => setIsInteracted(__ => ({ ...__, ..._ }))}>
             <Row className="mb-3">
               <Col>
                 <Form.Item
@@ -289,12 +307,32 @@ const AdvancedProductFilter = () => {
             </Row>
             <Row className="mb-3">
               <Col>
-                <Form.Item label="Min Price" type="number" name="minPrice" placeholder="Min Price">
+                <Form.Item
+                  label="Min Price"
+                  type="number"
+                  name="minPrice"
+                  placeholder="600"
+                  rules={[
+                    {
+                      pattern: amountRegex,
+                      message: 'Enter a positive number greater than 0 with up to 2 decimal places.',
+                    },
+                  ]}>
                   <Field />
                 </Form.Item>
               </Col>
               <Col>
-                <Form.Item label="Max Price" type="number" name="maxPrice" placeholder="Max Price">
+                <Form.Item
+                  label="Max Price"
+                  type="number"
+                  name="maxPrice"
+                  placeholder="1800"
+                  rules={[
+                    {
+                      pattern: amountRegex,
+                      message: 'Enter a positive number greater than 0 with up to 2 decimal places.',
+                    },
+                  ]}>
                   <Field />
                 </Form.Item>
               </Col>
@@ -313,7 +351,11 @@ const AdvancedProductFilter = () => {
                 </Col>
               )}
               <Col xs="auto">
-                <Button loading={isLoading} color="primary" type="submit">
+                <Button
+                  loading={isLoading}
+                  disabled={isObjectEmptyOrFieldsNull(isInteracted)}
+                  color="primary"
+                  type="submit">
                   Search Products
                 </Button>
               </Col>
@@ -336,6 +378,67 @@ const AdvancedProductFilter = () => {
           </div>
         </div>
       )}
+
+      {/* Product Modal */}
+      <ModalWrapper
+        isOpen={productModal}
+        toggle={() => setProductModal(false)}
+        title={Object.keys(currentProduct)?.length > 0 ? `Update ${currentProduct?.name}` : 'Create Product'}
+        size="lg"
+        backdrop="static"
+        isContentCentered={false}>
+        <CreateProductModal
+          product={currentProduct}
+          closeMe={() => {
+            setProductModal(false);
+            setRefetch(prev => !prev);
+          }}
+        />
+      </ModalWrapper>
+
+      {/* Product Images Modal */}
+      <ModalWrapper
+        isOpen={productImagesModal}
+        toggle={() => setProductImagesModal(false)}
+        title={`Images of ${currentProduct?.model}`}
+        size="md"
+        backdrop="static"
+        isContentCentered={false}>
+        <ProductImages images={currentProduct?.images} />
+      </ModalWrapper>
+
+      {/* Product Variants Modal */}
+      <ModalWrapper
+        isOpen={productVariantsModal}
+        toggle={() => setProductVariantsModal(false)}
+        title={`Variants of ${currentProduct?.model}`}
+        size="xl"
+        backdrop="static"
+        isContentCentered={false}>
+        <ProductVariants
+          closeMe={() => {
+            setProductVariantsModal(false);
+            setRefetch(prev => !prev);
+          }}
+          id={currentProduct?.id}
+        />
+      </ModalWrapper>
+
+      {/* Update Product Variant Modal */}
+      <ModalWrapper
+        isOpen={createVariantModal}
+        toggle={() => setCreateVariantModal(false)}
+        title="Create Variant"
+        backdrop="static"
+        isContentCentered={false}>
+        <ProductVariantModal
+          closeMeAndMyParent={() => {
+            setCreateVariantModal(false);
+            setRefetch(prev => !prev);
+          }}
+          productId={currentProduct?.id}
+        />
+      </ModalWrapper>
     </>
   );
 };
