@@ -8,6 +8,7 @@ export const manageProductsColumns = [
   'Brand',
   'Screen Size',
   'Description',
+  'Total Quantity',
   'No. of Variants',
   'Actions',
 ];

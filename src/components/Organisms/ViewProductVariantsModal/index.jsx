@@ -57,74 +57,46 @@ const ProductVariants = ({ closeMe, id }) => {
         <Table className="table table-bordered border-secondary table-wrap rounded">
           <thead>
             <tr>
-              <th scope="col">Id</th>
-              <th scope="col">RAM</th>
-              <th colSpan="2" scope="col">
-                Storage
-              </th>
-              <th colSpan="2" scope="col">
-                Processor
-              </th>
-              <th scope="col">Graphics Card</th>
-              <th scope="col">Graphics Card Memory Size</th>
-              <th scope="col">Price</th>
-              <th colSpan="2" scope="col">
-                Actions
-              </th>
+              {[
+                { label: 'Id', colspan: 1 },
+                { label: 'RAM', colspan: 1 },
+                { label: 'Storage', colspan: 2 },
+                { label: 'Processor', colspan: 2 },
+                { label: 'Graphics Card', colspan: 1 },
+                { label: 'Graphics Card Memory Size', colspan: 1 },
+                { label: 'Quantity', colspan: 1 },
+                { label: 'Price', colspan: 2 },
+                { label: 'Actions', colspan: 2 },
+              ].map(item => (
+                <th key={item} scope="col" colSpan={item.colspan}>
+                  {item.label}
+                </th>
+              ))}
             </tr>
             <tr>
-              <th scope="col" />
-              <th scope="col" />
-              <th scope="col">Type</th>
-              <th scope="col">Size</th>
-              <th scope="col">Name</th>
-              <th scope="col">Generation</th>
-              <th scope="col" />
-              <th scope="col" />
-              <th scope="col" />
-              <th scope="col" />
-              <th scope="col" />
+              {['', '', 'Type', 'Size', 'Name', 'Generation', '', '', '', 'Cost Price', 'Sale Price', '', ''].map(
+                label => (
+                  <th key={label} scope="col">
+                    {label}
+                  </th>
+                ),
+              )}
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               Array.from({ length: 8 }).map(_ => (
                 <tr key={_}>
-                  <th scope="row">
-                    <Skeleton height="20px" width="30px" />
-                  </th>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="100px" />
-                  </td>
-                  <td>
-                    <Skeleton height="20px" width="55px" />
-                  </td>
+                  {Array.from({ length: 13 }).map(_ => (
+                    <td key={_}>
+                      <Skeleton height="20px" width="100px" />
+                    </td>
+                  ))}
                 </tr>
               ))
             ) : productVariants.length === 0 ? (
               <tr>
-                <td colSpan="10" className="text-center">
+                <td colSpan="13" className="text-center">
                   <span className="fs-5">No variants found!</span>
                 </td>
               </tr>
@@ -139,7 +111,9 @@ const ProductVariants = ({ closeMe, id }) => {
                   <td>{variant.processor.generation}</td>
                   <td>{variant.graphicsCard.isGraphicsCard ? `${variant.graphicsCard.type}` : 'No Graphics Card'}</td>
                   <td>{variant.graphicsCard.isGraphicsCard ? variant.graphicsCard.memory : 'N/A'}</td>
-                  <td>{parseFloat(variant.price).toFixed(2)} AED</td>
+                  <td>{variant.quantity || 0}</td>
+                  <td>{parseFloat(variant.costPrice).toFixed(2)} AED</td>
+                  <td>{parseFloat(variant.salePrice).toFixed(2)} AED</td>
                   <td className="text-center">
                     <MdOutlineModeEditOutline
                       onClick={() => {
@@ -149,9 +123,9 @@ const ProductVariants = ({ closeMe, id }) => {
                       style={{ cursor: 'pointer' }}
                       color="green"
                       size={19}
-                      id="editVariant"
+                      id={`editVariant-${variant.id}`}
                     />
-                    <UncontrolledTooltip placement="top" target="editVariant">
+                    <UncontrolledTooltip placement="top" target={`editVariant-${variant.id}`}>
                       Edit Variant
                     </UncontrolledTooltip>
                   </td>
@@ -164,9 +138,9 @@ const ProductVariants = ({ closeMe, id }) => {
                       style={{ cursor: 'pointer' }}
                       color="red"
                       size={19}
-                      id="deleteVariant"
+                      id={`deleteVariant-${variant.id}`}
                     />
-                    <UncontrolledTooltip placement="top" target="deleteVariant">
+                    <UncontrolledTooltip placement="top" target={`deleteVariant-${variant.id}`}>
                       Delete Variant
                     </UncontrolledTooltip>
                   </td>

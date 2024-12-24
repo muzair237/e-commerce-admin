@@ -7,4 +7,5 @@ export const IBANRegex = /^[A-Z]{2}\d{2}(\s?[A-Z0-9]){1,30}$/;
 export const amountRegex = /^(?!0(?:\.0{1,2})?$)(?:[1-9]\d*(?:\.\d{1,2})?|0?\.\d{1,2})$/;
 export const labelRegex = /^[a-zA-Z0-9\s\-.,'/&()]+$/;
 export const digitsAndHyphenRegex = /^[0-9]+(?:-[0-9]+)*$/;
+export const integersRegex = /^(0|[1-9]\d*)$/;
 export const exactLength = length => new RegExp(`^\\d{${length}}$`);

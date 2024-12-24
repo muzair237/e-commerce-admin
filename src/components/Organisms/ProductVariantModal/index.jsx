@@ -5,7 +5,7 @@ import { Col, Row } from 'reactstrap';
 
 import { getNestedValue, handleApiCall, prepareProductFiltersData } from '@/helpers/common';
 import productsThunk from '@/slices/products/thunk';
-import { amountRegex } from '@/helpers/regexes';
+import { amountRegex, integersRegex } from '@/helpers/regexes';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
 import { Toast } from '@/components/Molecules/Toast';
@@ -64,7 +64,9 @@ const ProductVariantModal = ({
         processorGen,
         graphicsCardType,
         graphicsCardMemorySize,
-        price,
+        costPrice,
+        salePrice,
+        quantity,
       } = values;
       const payload = {
         storage: {
@@ -81,7 +83,9 @@ const ProductVariantModal = ({
           memory: graphicsCardMemorySize?.label,
           isGraphicsCard: !!graphicsCardType?.label,
         },
-        price: parseInt(price, 10),
+        costPrice: parseInt(costPrice, 10),
+        salePrice: parseInt(salePrice, 10),
+        quantity: quantity ? parseInt(quantity, 10) : 0,
       };
 
       if (type === 'createFromStart') {
@@ -155,7 +159,9 @@ const ProductVariantModal = ({
     if (variant && Object.keys(variant)?.length > 0) {
       const {
         ram,
-        price,
+        costPrice,
+        salePrice,
+        quantity,
         storage: { size: storageSize, type: storageType } = {},
         processor: { name: processorName, generation: processorGen } = {},
         graphicsCard: { type: graphicsCardType, memory: graphicsCardMemory, isGraphicsCard } = {},
@@ -169,7 +175,9 @@ const ProductVariantModal = ({
         storageSize: findOption(storageSizeOptions, storageSize),
         processorName: findOption(processorNameOptions, processorName),
         processorGen: findOption(processorGenOptions, processorGen),
-        price,
+        costPrice,
+        salePrice,
+        quantity: quantity || 0,
       };
 
       if (isGraphicsCard) {
@@ -182,6 +190,7 @@ const ProductVariantModal = ({
       form.setFieldsValue(formValues);
     }
   }, []);
+  console.log('form.getFieldsValue: ', form.getFieldsValue());
 
   return (
     <Row>
@@ -266,10 +275,10 @@ const ProductVariantModal = ({
           <Row className="mb-3">
             <Col sm={6}>
               <Form.Item
-                label="Price"
-                name="price"
+                label="Cost Price"
+                name="costPrice"
                 type="number"
-                placeholder="1200"
+                placeholder="1200.00"
                 rules={[
                   { required: true },
                   {
@@ -277,6 +286,34 @@ const ProductVariantModal = ({
                     message: 'Enter a positive number greater than 0 with up to 2 decimal places.',
                   },
                 ]}>
+                <Field />
+              </Form.Item>
+            </Col>
+            <Col sm={6}>
+              <Form.Item
+                label="Sale Price"
+                name="salePrice"
+                type="number"
+                placeholder="1400.00"
+                rules={[
+                  { required: true },
+                  {
+                    pattern: amountRegex,
+                    message: 'Enter a positive number greater than 0 with up to 2 decimal places.',
+                  },
+                ]}>
+                <Field />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row className="mb-3">
+            <Col sm={6}>
+              <Form.Item
+                label="Quantity"
+                name="quantity"
+                type="number"
+                placeholder="100"
+                rules={[{ pattern: integersRegex, message: 'Please enter a positive integer (no decimals).' }]}>
                 <Field />
               </Form.Item>
             </Col>
@@ -301,7 +338,9 @@ ProductVariantModal.propTypes = {
   variant: PropTypes.shape({
     id: PropTypes.number,
     ram: PropTypes.string,
-    price: PropTypes.number,
+    costPrice: PropTypes.number,
+    salePrice: PropTypes.number,
+    quantity: PropTypes.number,
     storage: PropTypes.shape({
       size: PropTypes.string,
       type: PropTypes.string,
