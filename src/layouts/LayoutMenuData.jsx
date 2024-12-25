@@ -6,6 +6,7 @@ const Navdata = () => {
   const [isDashboard, setIsDashboard] = useState(false);
   const [isManageBrands, setIsManageBrands] = useState(false);
   const [isManageProducts, setIsManageProducts] = useState(false);
+  const [isPermissions, setIsPermissions] = useState(false);
 
   const [iscurrentState, setIscurrentState] = useState('Dashboard');
 
@@ -70,6 +71,23 @@ const Navdata = () => {
         e.preventDefault();
         setIsManageProducts(!isManageProducts);
         setIscurrentState('isManageProducts');
+        updateIconSidebar(e);
+      },
+    },
+    {
+      label: 'Access Control',
+      isHeader: true,
+    },
+    {
+      id: 'permissions',
+      label: 'Permissions',
+      icon: 'ri-key-2-fill',
+      path: '/permissions',
+      stateVariables: isPermissions,
+      click(e) {
+        e.preventDefault();
+        setIsPermissions(!isPermissions);
+        setIscurrentState('Permissions');
         updateIconSidebar(e);
       },
     },
