@@ -19,20 +19,21 @@ import {
 } from 'reactstrap';
 
 const CustomizePermissionModal = ({ isEdit, tabs, selected, setPermissions, permissions, isOpen, setIsOpen }) => {
+  console.log('permissions: ', permissions);
+  console.log('tabs: ', tabs);
   const [rightTabs, setRightTabs] = useState(tabs || []);
   const [searchTabPermission, setSearchTabPermission] = useState();
   const [searchGroupPermission, setSearchGroupPermission] = useState();
   const [verticalTab, setVerticalTab] = useState(rightTabs[0]?.value);
   const [selectedPermissions, setSelectedPermissions] = useState(selected);
   const [filteredPermissions, setfilteredPermissions] = useState(
-    permissions.filter(
-      permission => permission.parent.includes(verticalTab) || permission.can === `${verticalTab}.nav`,
-    ),
+    permissions.filter(permission => permission.value === verticalTab || permission.can === `${verticalTab}.nav`),
   );
   const handlePermissions = () => {
     setPermissions(selectedPermissions);
     setIsOpen(prev => !prev);
   };
+
   return (
     <Modal
       size="xl"
@@ -63,6 +64,7 @@ const CustomizePermissionModal = ({ isEdit, tabs, selected, setPermissions, perm
                         ele => ele?.parent?.includes(newVerticalTab) || ele?.can === `${newVerticalTab}.nav`,
                       );
                       setfilteredPermissions(selectedTabsPermissions);
+
                       return newVerticalTab;
                     });
                   } else {
@@ -122,6 +124,7 @@ const CustomizePermissionModal = ({ isEdit, tabs, selected, setPermissions, perm
                                       ele?.parent?.includes(newVerticalTab) || ele?.can === `${newVerticalTab}.nav`,
                                   );
                                   setfilteredPermissions(selectedTabsPermissions);
+
                                   return newVerticalTab;
                                 });
                               }}
@@ -160,6 +163,7 @@ const CustomizePermissionModal = ({ isEdit, tabs, selected, setPermissions, perm
                                     if (isChecked) {
                                       return [...prev, ...currentTabPermissions];
                                     }
+
                                     return prev.filter(permission => !currentTabPermissions.includes(permission));
                                   });
                                 }}

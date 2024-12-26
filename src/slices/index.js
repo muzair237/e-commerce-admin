@@ -12,8 +12,11 @@ import BrandReducer from './brands/reducer';
 // Product
 import ProductReducer from './products/reducer';
 
-// Product
+// Permission
 import PermissionReducer from './permissions/reducer';
+
+// Role
+import RoleReducer from './roles/reducer';
 
 const rootReducer = combineReducers({
   Layout: LayoutReducer,
@@ -21,6 +24,7 @@ const rootReducer = combineReducers({
   Brand: BrandReducer,
   Product: ProductReducer,
   Permission: PermissionReducer,
+  Role: RoleReducer,
 });
 
 export default rootReducer;

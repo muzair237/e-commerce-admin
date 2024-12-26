@@ -3,28 +3,29 @@ import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import { Col, Container, Row, Card, CardHeader, UncontrolledTooltip } from 'reactstrap';
 import { useContextHook } from 'use-context-hook';
-import { MdRemoveRedEye, MdOutlineModeEdit } from 'react-icons/md';
+import { MdDeleteOutline, MdOutlineModeEdit } from 'react-icons/md';
 import { format } from 'date-fns';
 
-import brandsThunk from '@/slices/brands/thunk';
-import { manageBrandsColumns } from '@/common/columns';
+import rolesThunk from '@/slices/roles/thunk';
+import { roleColumns } from '@/common/columns';
 import { UtilsContext } from '@/contexts/utilsContext';
-import { handleApiCall, convertToFormData } from '@/helpers/common';
+import { handleApiCall, isObjectEmptyOrFieldsNull } from '@/helpers/common';
 import BreadCrumb from '@/components/Common/BreadCrumb';
 import TableContainer from '@/components/Common/TableContainer';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
-import BrandModal from '@/components/Organisms/BrandModal';
-import Anchor from '@/components/Molecules/Anchor';
 import Button from '@/components/Atoms/Button';
 import withAuthProtection from '@/components/Common/withAuthProtection';
+import ConfirmationModal from '@/components/Molecules/ConfirmationModal';
+import RoleModal from '@/components/Organisms/RoleModal';
 
-const ManageBrands = () => {
+const Roles = () => {
   const dispatch = useDispatch();
-  const [currentLogo, setCurrentLogo] = useState({});
-  const [brandModal, setBrandModal] = useState(false);
+  const [currentRole, setCurrentRole] = useState({});
+  const [roleModal, setRoleModal] = useState(false);
+  const [deletePermissionModal, setDeletePermissionModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { brands } = useSelector(state => state?.Brand) || {};
-  const { tableLoading } = useSelector(state => state?.Brand) || false;
+  const { roles } = useSelector(state => state?.Role) || {};
+  const { tableLoading } = useSelector(state => state?.Role) || false;
   const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
 
   const [filters, setFilters] = useState({
@@ -41,34 +42,18 @@ const ManageBrands = () => {
     setFilters(newSearchQuery);
   }, []);
 
-  const handleBrand = async payload => {
+  const handleDeletePermission = async () => {
     try {
-      const { name, logo } = payload;
-
       setIsLoading(true);
-
-      let success;
-      if (Object?.keys(currentLogo)?.length > 0) {
-        success = await handleApiCall(dispatch, brandsThunk.updateBrand, {
-          id: currentLogo?.id,
-          payload: convertToFormData({
-            name,
-            ...(logo instanceof File && { logo }),
-          }),
-        });
-      } else {
-        success = await handleApiCall(dispatch, brandsThunk.createBrand, {
-          payload: convertToFormData({
-            name,
-            logo,
-          }),
-        });
-      }
+      const success = await handleApiCall(dispatch, rolesThunk.deletePermission, { id: currentRole?.id });
 
       if (success) {
-        setBrandModal(false);
+        setDeletePermissionModal(false);
+        setCurrentRole({});
         setRefetch(prev => !prev);
       }
+    } catch ({ message }) {
+      console.error('Error deleting permission: ', message);
     } finally {
       setIsLoading(false);
     }
@@ -76,85 +61,87 @@ const ManageBrands = () => {
 
   const actionBtns = _ => (
     <div className="d-flex gap-3">
-      <div className="viewLogo">
-        <Anchor href={_?.logo} target="_blank">
-          <MdRemoveRedEye
-            style={{ cursor: 'pointer' }}
-            onClick={() => setCurrentLogo(_)}
-            color="#007BFF"
-            size={19}
-            id="viewLogo"
-          />
-        </Anchor>
-        <UncontrolledTooltip placement="top" target="viewLogo">
-          View Logo
-        </UncontrolledTooltip>
-      </div>
       <div className="edit">
         <MdOutlineModeEdit
           style={{ cursor: 'pointer' }}
           onClick={() => {
-            setCurrentLogo({ id: _?.id, name: _?.name, logo: _?.logo });
-            setBrandModal(true);
+            setCurrentRole(_);
+            setRoleModal(true);
           }}
           color="green"
           size={19}
           id="edit"
         />
         <UncontrolledTooltip placement="top" target="edit">
-          Edit
+          Edit Role
+        </UncontrolledTooltip>
+      </div>
+      <div className="deletePermission">
+        <MdDeleteOutline
+          style={{ cursor: 'pointer' }}
+          onClick={() => {
+            setCurrentRole(_);
+            setDeletePermissionModal(true);
+          }}
+          color="red"
+          size={19}
+          id="deletePermission"
+        />
+        <UncontrolledTooltip placement="top" target="deletePermission">
+          Delete Role
         </UncontrolledTooltip>
       </div>
     </div>
   );
 
-  const { brands_rows, totalCount } = useMemo(
+  const { roles_rows, totalCount } = useMemo(
     () => ({
-      brands_rows: brands?.items?.map(_ => [
+      roles_rows: roles?.items?.map(_ => [
         format(new Date(_?.created_at), 'MMMM dd, yyyy') || '------------',
-        _?.name || '------------',
+        _?.type || '------------',
+        _?.description || '------------',
         actionBtns(_),
       ]),
-      totalCount: brands?.totalItems,
+      totalCount: roles?.totalItems,
     }),
-    [brands],
+    [roles],
   );
 
   useEffect(() => {
-    dispatch(brandsThunk.getAllBrands(filters));
+    dispatch(rolesThunk.getAllRoles(filters));
   }, [filters, refetch]);
 
   return (
     <>
       <Head>
-        <title>WebNova | MANAGE BRANDS</title>
+        <title>WebNova | ROLES</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
 
       <div className="page-content">
         <Container fluid>
-          <BreadCrumb title="Manage Brands" />
+          <BreadCrumb title="Roles" />
           <Row>
             <Col lg={12}>
-              <Card id="permissionList">
+              <Card id="roleList">
                 <CardHeader>
                   <Row className="g-4 align-items-center">
                     <div className="col-sm">
                       <div>
-                        <h5 className="card-title mb-0 fw-semibold">Manage Brands</h5>
+                        <h5 className="card-title mb-0 fw-semibold">Roles</h5>
                       </div>
                     </div>
                     <div className="col-sm-auto">
                       <div>
                         <Button
                           onClick={() => {
-                            setCurrentLogo({});
-                            setBrandModal(true);
+                            setCurrentRole({});
+                            setRoleModal(true);
                           }}
                           type="button"
                           className="btn btn-dark add-btn"
                           id="create-btn">
-                          <i className="ri-add-line align-bottom me-1" /> Create Brand
+                          <i className="ri-add-line align-bottom me-1" /> Create Role
                         </Button>
                       </div>
                     </div>
@@ -163,8 +150,8 @@ const ManageBrands = () => {
                 <div className="card-body pt-0">
                   <div>
                     <TableContainer
-                      columns={manageBrandsColumns}
-                      data={brands_rows || []}
+                      columns={roleColumns}
+                      data={roles_rows || []}
                       isLoading={tableLoading}
                       isGeneralGlobalFilter
                       currentPage={+filters?.page}
@@ -180,18 +167,39 @@ const ManageBrands = () => {
         </Container>
       </div>
 
-      {/* Logo Modal */}
+      {/* Role Modal */}
       <ModalWrapper
-        isOpen={brandModal}
-        toggle={() => setBrandModal(false)}
-        title={Object.keys(currentLogo)?.length > 0 ? `Update ${currentLogo?.name}` : 'Create Brand'}
+        isOpen={roleModal}
+        toggle={() => setRoleModal(false)}
+        title={!isObjectEmptyOrFieldsNull(currentRole) ? 'Update Role' : 'Create Role'}
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <BrandModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleBrand} />
+        <RoleModal
+          role={currentRole}
+          closeMe={() => {
+            setRoleModal(false);
+            setRefetch(prev => !prev);
+          }}
+        />
+      </ModalWrapper>
+
+      {/* Delete Permission Confirmation Modal */}
+      <ModalWrapper
+        isOpen={deletePermissionModal}
+        toggle={() => setDeletePermissionModal(false)}
+        title="Delete Permission"
+        backdrop="static"
+        isContentCentered={false}>
+        <ConfirmationModal
+          type="delete"
+          message="Are you sure you want to delete this permission?"
+          isLoading={isLoading}
+          handleClick={handleDeletePermission}
+        />
       </ModalWrapper>
     </>
   );
 };
 
-export default withAuthProtection(ManageBrands);
+export default withAuthProtection(Roles);

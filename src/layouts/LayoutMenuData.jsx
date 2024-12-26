@@ -7,6 +7,7 @@ const Navdata = () => {
   const [isManageBrands, setIsManageBrands] = useState(false);
   const [isManageProducts, setIsManageProducts] = useState(false);
   const [isPermissions, setIsPermissions] = useState(false);
+  const [isRoles, setIsRoles] = useState(false);
 
   const [iscurrentState, setIscurrentState] = useState('Dashboard');
 
@@ -88,6 +89,19 @@ const Navdata = () => {
         e.preventDefault();
         setIsPermissions(!isPermissions);
         setIscurrentState('Permissions');
+        updateIconSidebar(e);
+      },
+    },
+    {
+      id: 'roles',
+      label: 'Roles',
+      icon: 'ri-team-fill',
+      path: '/roles',
+      stateVariables: isRoles,
+      click(e) {
+        e.preventDefault();
+        setIsRoles(!isRoles);
+        setIscurrentState('Roles');
         updateIconSidebar(e);
       },
     },
