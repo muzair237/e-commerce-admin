@@ -22,7 +22,7 @@ const Roles = () => {
   const dispatch = useDispatch();
   const [currentRole, setCurrentRole] = useState({});
   const [roleModal, setRoleModal] = useState(false);
-  const [deletePermissionModal, setDeletePermissionModal] = useState(false);
+  const [deleteRoleModal, setDeleteRoleModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { roles } = useSelector(state => state?.Role) || {};
   const { tableLoading } = useSelector(state => state?.Role) || false;
@@ -42,18 +42,18 @@ const Roles = () => {
     setFilters(newSearchQuery);
   }, []);
 
-  const handleDeletePermission = async () => {
+  const handleDeleteRole = async () => {
     try {
       setIsLoading(true);
-      const success = await handleApiCall(dispatch, rolesThunk.deletePermission, { id: currentRole?.id });
+      const success = await handleApiCall(dispatch, rolesThunk.deleteRole, { id: currentRole?.id });
 
       if (success) {
-        setDeletePermissionModal(false);
+        setDeleteRoleModal(false);
         setCurrentRole({});
         setRefetch(prev => !prev);
       }
     } catch ({ message }) {
-      console.error('Error deleting permission: ', message);
+      console.error('Error deleting role: ', message);
     } finally {
       setIsLoading(false);
     }
@@ -76,18 +76,18 @@ const Roles = () => {
           Edit Role
         </UncontrolledTooltip>
       </div>
-      <div className="deletePermission">
+      <div className="deleteRole">
         <MdDeleteOutline
           style={{ cursor: 'pointer' }}
           onClick={() => {
             setCurrentRole(_);
-            setDeletePermissionModal(true);
+            setDeleteRoleModal(true);
           }}
           color="red"
           size={19}
-          id="deletePermission"
+          id="deleteRole"
         />
-        <UncontrolledTooltip placement="top" target="deletePermission">
+        <UncontrolledTooltip placement="top" target="deleteRole">
           Delete Role
         </UncontrolledTooltip>
       </div>
@@ -184,18 +184,18 @@ const Roles = () => {
         />
       </ModalWrapper>
 
-      {/* Delete Permission Confirmation Modal */}
+      {/* Delete Role Confirmation Modal */}
       <ModalWrapper
-        isOpen={deletePermissionModal}
-        toggle={() => setDeletePermissionModal(false)}
-        title="Delete Permission"
+        isOpen={deleteRoleModal}
+        toggle={() => setDeleteRoleModal(false)}
+        title="Delete Role"
         backdrop="static"
         isContentCentered={false}>
         <ConfirmationModal
           type="delete"
-          message="Are you sure you want to delete this permission?"
+          message="Are you sure you want to delete this role?"
           isLoading={isLoading}
-          handleClick={handleDeletePermission}
+          handleClick={handleDeleteRole}
         />
       </ModalWrapper>
     </>
