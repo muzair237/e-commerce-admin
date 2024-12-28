@@ -2,13 +2,13 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { handleThunkError } from '@/helpers/common';
 import { Toast } from '../../components/Molecules/Toast';
 import { Fetch } from '../../helpers/fetchWrapper';
-import { CREATE_ROLE, DELETE_ROLE, UPDATE_ROLE, GET_ALL_ROLES, GET_UNIQUE_ROLES } from '../../helpers/url_helper';
+import { CREATE_ADMIN, DELETE_ADMIN, GET_ALL_ADMINS, UPDATE_ADIMN, UPDATE_PASSWORD } from '../../helpers/url_helper';
 
-const rolesThunk = {
-  url: `${process.env.NEXT_PUBLIC_ROLES_API_URL}`,
+const adminThunk = {
+  url: `${process.env.NEXT_PUBLIC_ADMINS_API_URL}`,
 
-  getAllRoles: createAsyncThunk(
-    'roles/get-all-roles',
+  getAllAdmins: createAsyncThunk(
+    'admins/get-all-admins',
     async ({
       page = 1,
       itemsPerPage = 10,
@@ -17,10 +17,11 @@ const rolesThunk = {
       endDate = '',
       searchText = '',
       sort = '',
+      roleType = '',
     }) => {
       try {
         let res = await Fetch.get(
-          `${rolesThunk.url}/${GET_ALL_ROLES}?page=${page}&itemsPerPage=${itemsPerPage}&getAll=${getAll}&startDate=${startDate}&endDate=${endDate}&searchText=${searchText}&sort=${sort}`,
+          `${adminThunk.url}/${GET_ALL_ADMINS}?page=${page}&itemsPerPage=${itemsPerPage}&getAll=${getAll}&startDate=${startDate}&endDate=${endDate}&searchText=${searchText}&sort=${sort}&roleType=${roleType}`,
         );
         if (res.status >= 200 && res.status < 300) {
           res = await res.json();
@@ -36,30 +37,14 @@ const rolesThunk = {
     },
   ),
 
-  getUniqueRoles: createAsyncThunk('roles/get-unique-roles', async () => {
+  createAdmin: createAsyncThunk('admins/create-admin', async ({ payload }) => {
     try {
-      let res = await Fetch.get(`${rolesThunk.url}/${GET_UNIQUE_ROLES}`);
-      if (res.status >= 200 && res.status < 300) {
-        res = await res.json();
-
-        return res?.data?.uniqueRoles;
-      }
-      const { message } = await res.json();
-      throw new Error(message ?? 'Something Went Wrong');
-    } catch (error) {
-      handleThunkError(error);
-      throw error?.message;
-    }
-  }),
-
-  createRole: createAsyncThunk('roles/create-role', async ({ payload }) => {
-    try {
-      let res = await Fetch.post(`${rolesThunk.url}/${CREATE_ROLE}`, payload);
+      let res = await Fetch.post(`${adminThunk.url}/${CREATE_ADMIN}`, payload);
       if (res.status >= 200 && res.status < 300) {
         res = await res.json();
         Toast({
           type: 'success',
-          message: 'ROle created successfully!',
+          message: 'Admin created Successfully!',
         });
 
         return res;
@@ -72,14 +57,14 @@ const rolesThunk = {
     }
   }),
 
-  updateRole: createAsyncThunk('role/update-role', async ({ id, payload }) => {
+  updateAdmin: createAsyncThunk('admins/update-admin', async ({ id, payload }) => {
     try {
-      let res = await Fetch.put(`${rolesThunk.url}/${UPDATE_ROLE}/${id}`, payload);
+      let res = await Fetch.patch(`${adminThunk.url}/${UPDATE_ADIMN}/${id}`, payload);
       if (res.status >= 200 && res.status < 300) {
         res = await res.json();
         Toast({
           type: 'success',
-          message: 'Role updated successfully!',
+          message: 'Admin updated Successfully!',
         });
 
         return res;
@@ -92,14 +77,34 @@ const rolesThunk = {
     }
   }),
 
-  deleteRole: createAsyncThunk('roles/delete-role', async ({ id }) => {
+  updatePassword: createAsyncThunk('admins/update-password', async ({ id, payload }) => {
     try {
-      let res = await Fetch.delete(`${rolesThunk.url}/${DELETE_ROLE}/${id}`);
+      let res = await Fetch.patch(`${adminThunk.url}/${UPDATE_PASSWORD}/${id}`, payload);
       if (res.status >= 200 && res.status < 300) {
         res = await res.json();
         Toast({
           type: 'success',
-          message: 'Role deleted successfully!',
+          message: 'Password updated Successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
+  deleteAdmin: createAsyncThunk('admins/delete-admin', async ({ id }) => {
+    try {
+      let res = await Fetch.delete(`${adminThunk.url}/${DELETE_ADMIN}/${id}`);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Admin deleted successfully!',
         });
 
         return res;
@@ -113,4 +118,4 @@ const rolesThunk = {
   }),
 };
 
-export default rolesThunk;
+export default adminThunk;

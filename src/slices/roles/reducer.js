@@ -4,6 +4,7 @@ import rolesThunk from './thunk';
 
 const initialState = {
   roles: {},
+  uniqueRoles: [],
   tableLoading: false,
 };
 
@@ -23,6 +24,11 @@ const roleSlice = createSlice({
       })
       .addCase(rolesThunk.getAllRoles.rejected, state => {
         state.tableLoading = false;
+      })
+
+      // GET UNIQUE ROLES
+      .addCase(rolesThunk.getUniqueRoles.fulfilled, (state, action) => {
+        state.uniqueRoles = action.payload;
       });
   },
 });

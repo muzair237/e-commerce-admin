@@ -18,6 +18,9 @@ import PermissionReducer from './permissions/reducer';
 // Role
 import RoleReducer from './roles/reducer';
 
+// Role
+import AdminReducer from './admins/reducer';
+
 const rootReducer = combineReducers({
   Layout: LayoutReducer,
   Auth: AuthReducer,
@@ -25,6 +28,7 @@ const rootReducer = combineReducers({
   Product: ProductReducer,
   Permission: PermissionReducer,
   Role: RoleReducer,
+  Admin: AdminReducer,
 });
 
 export default rootReducer;

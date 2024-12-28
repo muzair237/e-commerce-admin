@@ -6,6 +6,7 @@ import Skeleton from '../Atoms/Skeleton';
 import Pagination from '../Molecules/Pagination';
 import GeneralGlobalFilter from '../Filters/GeneralGlobalFilters';
 import ProductFilter from '../Filters/ProductFilter';
+import { AdminFilter } from './Filters';
 
 const TableContainer = ({
   columns,
@@ -13,17 +14,18 @@ const TableContainer = ({
   isGeneralGlobalFilter,
   isProductFilter,
   isLoading,
-  isRoleFilter,
   isAdminFilter,
   currentPage,
   totalCount,
   itemsPerPage,
   setFilters,
+  uniqueRoles,
 }) => (
   <>
     <Row className="mb-3">
       {isGeneralGlobalFilter && <GeneralGlobalFilter setFilters={setFilters} />}
       {isProductFilter && <ProductFilter setFilters={setFilters} />}
+      {isAdminFilter && <AdminFilter setFilters={setFilters} uniqueRoles={uniqueRoles} />}
     </Row>
     <div className="table-responsive table-card mt-3 mb-1">
       <table className="table align-middle" id="Table">

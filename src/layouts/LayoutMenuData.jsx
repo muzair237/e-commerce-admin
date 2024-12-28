@@ -8,6 +8,7 @@ const Navdata = () => {
   const [isManageProducts, setIsManageProducts] = useState(false);
   const [isPermissions, setIsPermissions] = useState(false);
   const [isRoles, setIsRoles] = useState(false);
+  const [isAdmins, setIsAdmins] = useState(false);
 
   const [iscurrentState, setIscurrentState] = useState('Dashboard');
 
@@ -102,6 +103,19 @@ const Navdata = () => {
         e.preventDefault();
         setIsRoles(!isRoles);
         setIscurrentState('Roles');
+        updateIconSidebar(e);
+      },
+    },
+    {
+      id: 'admins',
+      label: 'Admins',
+      icon: 'ri-admin-fill',
+      path: '/admins',
+      stateVariables: isAdmins,
+      click(e) {
+        e.preventDefault();
+        setIsAdmins(!isAdmins);
+        setIscurrentState('Admins');
         updateIconSidebar(e);
       },
     },

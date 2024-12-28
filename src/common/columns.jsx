@@ -20,4 +20,4 @@ export const permissionColumns = ['Created At', 'Can', 'Description', 'Actions']
 export const roleColumns = ['Created At', 'Type', 'Description', 'Actions'];
 
 // ADMIN COLUMN(S)
-export const adminColumns = ['Created At', 'Full Name', 'Email', 'Roles', 'Actions'];
+export const adminColumns = ['Created At', 'Name', 'Email', 'Roles', 'Actions'];
