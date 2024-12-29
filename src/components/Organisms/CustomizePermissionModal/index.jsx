@@ -12,7 +12,7 @@ const CustomizePermissionModal = ({ tabs, selected, setPermissions, permissions,
   const [verticalTab, setVerticalTab] = useState(rightTabs[0]?.value);
   const [selectedPermissions, setSelectedPermissions] = useState(selected);
   const [filteredPermissions, setFilteredPermissions] = useState(
-    permissions.filter(permission => permission.value === verticalTab || permission.can === `${verticalTab}.nav`),
+    permissions.filter(ele => ele?.parents?.includes(verticalTab) || ele?.can === `${verticalTab}.nav`),
   );
 
   const handlePermissions = () => {

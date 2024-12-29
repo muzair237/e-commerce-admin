@@ -26,6 +26,7 @@ const Permissions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { permissions } = useSelector(state => state?.Permission) || {};
   const { tableLoading } = useSelector(state => state?.Permission) || false;
+  const { hasPermission } = useSelector(state => state?.Auth) || [];
   const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
 
   const [filters, setFilters] = useState({
@@ -61,36 +62,41 @@ const Permissions = () => {
 
   const actionBtns = _ => (
     <div className="d-flex gap-3">
-      <div className="edit">
-        <MdOutlineModeEdit
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentPermission(_);
-            setPermissionModal(true);
-          }}
-          color="green"
-          size={19}
-          id="edit"
-        />
-        <UncontrolledTooltip placement="top" target="edit">
-          Edit Permission
-        </UncontrolledTooltip>
-      </div>
-      <div className="deletePermission">
-        <MdDeleteOutline
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentPermission(_);
-            setDeletePermissionModal(true);
-          }}
-          color="red"
-          size={19}
-          id="deletePermission"
-        />
-        <UncontrolledTooltip placement="top" target="deletePermission">
-          Delete Permission
-        </UncontrolledTooltip>
-      </div>
+      {hasPermission.includes('permissions.update-permission') && (
+        <div className="edit">
+          <MdOutlineModeEdit
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentPermission(_);
+              setPermissionModal(true);
+            }}
+            color="green"
+            size={19}
+            id="edit"
+          />
+          <UncontrolledTooltip placement="top" target="edit">
+            Update Permission
+          </UncontrolledTooltip>
+        </div>
+      )}
+
+      {hasPermission.includes('permissions.delete-permission') && (
+        <div className="deletePermission">
+          <MdDeleteOutline
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentPermission(_);
+              setDeletePermissionModal(true);
+            }}
+            color="red"
+            size={19}
+            id="deletePermission"
+          />
+          <UncontrolledTooltip placement="top" target="deletePermission">
+            Delete Permission
+          </UncontrolledTooltip>
+        </div>
+      )}
     </div>
   );
 
@@ -131,20 +137,22 @@ const Permissions = () => {
                         <h5 className="card-title mb-0 fw-semibold">Permissions</h5>
                       </div>
                     </div>
-                    <div className="col-sm-auto">
-                      <div>
-                        <Button
-                          onClick={() => {
-                            setCurrentPermission({});
-                            setPermissionModal(true);
-                          }}
-                          type="button"
-                          className="btn btn-dark add-btn"
-                          id="create-btn">
-                          <i className="ri-add-line align-bottom me-1" /> Create Permission
-                        </Button>
+                    {hasPermission.includes('permissions.create-permission') && (
+                      <div className="col-sm-auto">
+                        <div>
+                          <Button
+                            onClick={() => {
+                              setCurrentPermission({});
+                              setPermissionModal(true);
+                            }}
+                            type="button"
+                            className="btn btn-dark add-btn"
+                            id="create-btn">
+                            <i className="ri-add-line align-bottom me-1" /> Create Permission
+                          </Button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </Row>
                 </CardHeader>
                 <div className="card-body pt-0">

@@ -9,6 +9,7 @@ export const LOGOUT = 'logout';
 export const GET_ALL_BRANDS = 'get-all-brands';
 export const CREATE_BRAND = 'create-brand';
 export const UPDATE_BRAND = 'update-brand';
+export const DELETE_BRAND = 'delete-brand';
 
 // MANAGE PRODUCTS ENDPOINT(S)
 export const GET_ALL_PRODUCTS = 'get-all-products';
@@ -20,6 +21,7 @@ export const GET_PRODUCT_VARIANTS = 'get-product-variants';
 export const CREATE_PRODUCT_VARIANT = 'create-product-variant';
 export const UPDATE_PRODUCT_VARIANT = 'update-product-variant';
 export const DELETE_PRODUCT_VARIANT = 'delete-product-variant';
+export const DELETE_PRODUCT = 'delete-product';
 
 // PERMISSIONS ENDPOINT(S)
 export const GET_ALL_PERMISSIONS = 'get-all-permissions';

@@ -31,6 +31,7 @@ const Admins = () => {
   const { admins } = useSelector(state => state?.Admin) || {};
   const { uniqueRoles } = useSelector(state => state?.Role) || [];
   const { tableLoading } = useSelector(state => state?.Admin) || false;
+  const { hasPermission } = useSelector(state => state?.Auth) || [];
   const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
 
   const [filters, setFilters] = useState({
@@ -67,51 +68,59 @@ const Admins = () => {
 
   const actionBtns = _ => (
     <div className="d-flex gap-3">
-      <div className="edit">
-        <MdOutlineModeEdit
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentAdmin(_);
-            setAdminModal(true);
-          }}
-          color="green"
-          size={19}
-          id="edit"
-        />
-        <UncontrolledTooltip placement="top" target="edit">
-          Edit Admin
-        </UncontrolledTooltip>
-      </div>
-      <div className="update-password">
-        <GrUpdate
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentAdmin({ id: _?.id });
-            setUpdatePasswordModal(true);
-          }}
-          color="blue"
-          size={15}
-          id="update-password"
-        />
-        <UncontrolledTooltip placement="top" target="update-password">
-          Update Password
-        </UncontrolledTooltip>
-      </div>
-      <div className="deleteAdmin">
-        <MdDeleteOutline
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentAdmin({ id: _?.id });
-            setDeleteAdminModal(true);
-          }}
-          color="red"
-          size={19}
-          id="deleteAdmin"
-        />
-        <UncontrolledTooltip placement="top" target="deleteAdmin">
-          Delete Admin
-        </UncontrolledTooltip>
-      </div>
+      {hasPermission.includes('admins.update-admin') && (
+        <div className="edit">
+          <MdOutlineModeEdit
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentAdmin(_);
+              setAdminModal(true);
+            }}
+            color="green"
+            size={19}
+            id="edit"
+          />
+          <UncontrolledTooltip placement="top" target="edit">
+            Update Admin
+          </UncontrolledTooltip>
+        </div>
+      )}
+
+      {hasPermission.includes('admins.update-password') && (
+        <div className="update-password">
+          <GrUpdate
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentAdmin({ id: _?.id });
+              setUpdatePasswordModal(true);
+            }}
+            color="blue"
+            size={15}
+            id="update-password"
+          />
+          <UncontrolledTooltip placement="top" target="update-password">
+            Update Password
+          </UncontrolledTooltip>
+        </div>
+      )}
+
+      {hasPermission.includes('admins.delete-admin') && (
+        <div className="deleteAdmin">
+          <MdDeleteOutline
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentAdmin({ id: _?.id });
+              setDeleteAdminModal(true);
+            }}
+            color="red"
+            size={19}
+            id="deleteAdmin"
+          />
+          <UncontrolledTooltip placement="top" target="deleteAdmin">
+            Delete Admin
+          </UncontrolledTooltip>
+        </div>
+      )}
     </div>
   );
 
@@ -131,8 +140,11 @@ const Admins = () => {
 
   useEffect(() => {
     dispatch(adminsThunk.getAllAdmins(filters));
-    dispatch(rolesThunk.getUniqueRoles());
   }, [filters, refetch]);
+
+  useEffect(() => {
+    dispatch(rolesThunk.getUniqueRoles());
+  }, []);
 
   return (
     <>
@@ -154,20 +166,22 @@ const Admins = () => {
                         <h5 className="card-title mb-0 fw-semibold">Admins</h5>
                       </div>
                     </div>
-                    <div className="col-sm-auto">
-                      <div>
-                        <Button
-                          onClick={() => {
-                            setCurrentAdmin({});
-                            setAdminModal(true);
-                          }}
-                          type="button"
-                          className="btn btn-dark add-btn"
-                          id="create-btn">
-                          <i className="ri-add-line align-bottom me-1" /> Create Admin
-                        </Button>
+                    {hasPermission.includes('admins.create-admin') && (
+                      <div className="col-sm-auto">
+                        <div>
+                          <Button
+                            onClick={() => {
+                              setCurrentAdmin({});
+                              setAdminModal(true);
+                            }}
+                            type="button"
+                            className="btn btn-dark add-btn"
+                            id="create-btn">
+                            <i className="ri-add-line align-bottom me-1" /> Create Admin
+                          </Button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </Row>
                 </CardHeader>
                 <div className="card-body pt-0">

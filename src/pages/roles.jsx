@@ -26,6 +26,7 @@ const Roles = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { roles } = useSelector(state => state?.Role) || {};
   const { tableLoading } = useSelector(state => state?.Role) || false;
+  const { hasPermission } = useSelector(state => state?.Auth) || [];
   const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
 
   const [filters, setFilters] = useState({
@@ -61,36 +62,41 @@ const Roles = () => {
 
   const actionBtns = _ => (
     <div className="d-flex gap-3">
-      <div className="edit">
-        <MdOutlineModeEdit
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentRole(_);
-            setRoleModal(true);
-          }}
-          color="green"
-          size={19}
-          id="edit"
-        />
-        <UncontrolledTooltip placement="top" target="edit">
-          Edit Role
-        </UncontrolledTooltip>
-      </div>
-      <div className="deleteRole">
-        <MdDeleteOutline
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentRole(_);
-            setDeleteRoleModal(true);
-          }}
-          color="red"
-          size={19}
-          id="deleteRole"
-        />
-        <UncontrolledTooltip placement="top" target="deleteRole">
-          Delete Role
-        </UncontrolledTooltip>
-      </div>
+      {hasPermission.includes('roles.update-role') && (
+        <div className="edit">
+          <MdOutlineModeEdit
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentRole(_);
+              setRoleModal(true);
+            }}
+            color="green"
+            size={19}
+            id="edit"
+          />
+          <UncontrolledTooltip placement="top" target="edit">
+            Update Role
+          </UncontrolledTooltip>
+        </div>
+      )}
+
+      {hasPermission.includes('roles.delete-role') && (
+        <div className="deleteRole">
+          <MdDeleteOutline
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentRole(_);
+              setDeleteRoleModal(true);
+            }}
+            color="red"
+            size={19}
+            id="deleteRole"
+          />
+          <UncontrolledTooltip placement="top" target="deleteRole">
+            Delete Role
+          </UncontrolledTooltip>
+        </div>
+      )}
     </div>
   );
 
@@ -131,20 +137,22 @@ const Roles = () => {
                         <h5 className="card-title mb-0 fw-semibold">Roles</h5>
                       </div>
                     </div>
-                    <div className="col-sm-auto">
-                      <div>
-                        <Button
-                          onClick={() => {
-                            setCurrentRole({});
-                            setRoleModal(true);
-                          }}
-                          type="button"
-                          className="btn btn-dark add-btn"
-                          id="create-btn">
-                          <i className="ri-add-line align-bottom me-1" /> Create Role
-                        </Button>
+                    {hasPermission.includes('roles.create-role') && (
+                      <div className="col-sm-auto">
+                        <div>
+                          <Button
+                            onClick={() => {
+                              setCurrentRole({});
+                              setRoleModal(true);
+                            }}
+                            type="button"
+                            className="btn btn-dark add-btn"
+                            id="create-btn">
+                            <i className="ri-add-line align-bottom me-1" /> Create Role
+                          </Button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </Row>
                 </CardHeader>
                 <div className="card-body pt-0">

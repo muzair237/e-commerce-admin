@@ -16,6 +16,8 @@ const withAuthProtection = WrappedComponent => {
         router.replace(allowedPages[0]);
       } else if (token && allowedPages.includes(router.pathname)) {
         setIsAllowed(true);
+      } else {
+        router.replace(allowedPages[0]);
       }
     }, [router.pathname, token, allowedPages]);
 

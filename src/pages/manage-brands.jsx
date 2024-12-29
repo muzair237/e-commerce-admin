@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useDispatch, useSelector } from 'react-redux';
 import { Col, Container, Row, Card, CardHeader, UncontrolledTooltip } from 'reactstrap';
 import { useContextHook } from 'use-context-hook';
-import { MdRemoveRedEye, MdOutlineModeEdit } from 'react-icons/md';
+import { MdRemoveRedEye, MdOutlineModeEdit, MdDeleteOutline } from 'react-icons/md';
 import { format } from 'date-fns';
 
 import brandsThunk from '@/slices/brands/thunk';
@@ -17,13 +17,16 @@ import BrandModal from '@/components/Organisms/BrandModal';
 import Anchor from '@/components/Molecules/Anchor';
 import Button from '@/components/Atoms/Button';
 import withAuthProtection from '@/components/Common/withAuthProtection';
+import ConfirmationModal from '@/components/Molecules/ConfirmationModal';
 
 const ManageBrands = () => {
   const dispatch = useDispatch();
-  const [currentLogo, setCurrentLogo] = useState({});
+  const [currentBrand, setCurrentBrand] = useState({});
   const [brandModal, setBrandModal] = useState(false);
+  const [deleteBrandModal, setDeleteBrandModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { brands } = useSelector(state => state?.Brand) || {};
+  const { hasPermission } = useSelector(state => state?.Auth) || [];
   const { tableLoading } = useSelector(state => state?.Brand) || false;
   const { refetch, setRefetch } = useContextHook(UtilsContext, ['refetch', 'setRefetch']);
 
@@ -48,9 +51,9 @@ const ManageBrands = () => {
       setIsLoading(true);
 
       let success;
-      if (Object?.keys(currentLogo)?.length > 0) {
+      if (Object?.keys(currentBrand)?.length > 0) {
         success = await handleApiCall(dispatch, brandsThunk.updateBrand, {
-          id: currentLogo?.id,
+          id: currentBrand?.id,
           payload: convertToFormData({
             name,
             ...(logo instanceof File && { logo }),
@@ -74,37 +77,76 @@ const ManageBrands = () => {
     }
   };
 
+  const handleDeleteBrand = async () => {
+    try {
+      setIsLoading(true);
+      const success = await handleApiCall(dispatch, brandsThunk.deleteBrand, { id: currentBrand?.id });
+
+      if (success) {
+        setDeleteBrandModal(false);
+        setCurrentBrand({});
+        setRefetch(prev => !prev);
+      }
+    } catch ({ message }) {
+      console.error('Error deleting brand: ', message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const actionBtns = _ => (
     <div className="d-flex gap-3">
-      <div className="viewLogo">
-        <Anchor href={_?.logo} target="_blank">
-          <MdRemoveRedEye
+      {hasPermission.includes('manage-brands.view-logo') && (
+        <div className="viewLogo">
+          <Anchor href={_?.logo} target="_blank">
+            <MdRemoveRedEye
+              style={{ cursor: 'pointer' }}
+              onClick={() => setCurrentBrand(_)}
+              color="#007BFF"
+              size={19}
+              id="viewLogo"
+            />
+          </Anchor>
+          <UncontrolledTooltip placement="top" target="viewLogo">
+            View Logo
+          </UncontrolledTooltip>
+        </div>
+      )}
+      {hasPermission.includes('manage-brands.update-brand') && (
+        <div className="edit">
+          <MdOutlineModeEdit
             style={{ cursor: 'pointer' }}
-            onClick={() => setCurrentLogo(_)}
-            color="#007BFF"
+            onClick={() => {
+              setCurrentBrand({ id: _?.id, name: _?.name, logo: _?.logo });
+              setBrandModal(true);
+            }}
+            color="green"
             size={19}
-            id="viewLogo"
+            id="edit"
           />
-        </Anchor>
-        <UncontrolledTooltip placement="top" target="viewLogo">
-          View Logo
-        </UncontrolledTooltip>
-      </div>
-      <div className="edit">
-        <MdOutlineModeEdit
-          style={{ cursor: 'pointer' }}
-          onClick={() => {
-            setCurrentLogo({ id: _?.id, name: _?.name, logo: _?.logo });
-            setBrandModal(true);
-          }}
-          color="green"
-          size={19}
-          id="edit"
-        />
-        <UncontrolledTooltip placement="top" target="edit">
-          Edit
-        </UncontrolledTooltip>
-      </div>
+          <UncontrolledTooltip placement="top" target="edit">
+            Edit Brand
+          </UncontrolledTooltip>
+        </div>
+      )}
+
+      {hasPermission.includes('manage-brands.delete-brand') && (
+        <div className="deleteBrand">
+          <MdDeleteOutline
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              setCurrentBrand({ id: _?.id });
+              setDeleteBrandModal(true);
+            }}
+            color="red"
+            size={19}
+            id="deleteBrand"
+          />
+          <UncontrolledTooltip placement="top" target="deleteBrand">
+            Delete Brand
+          </UncontrolledTooltip>
+        </div>
+      )}
     </div>
   );
 
@@ -144,20 +186,22 @@ const ManageBrands = () => {
                         <h5 className="card-title mb-0 fw-semibold">Manage Brands</h5>
                       </div>
                     </div>
-                    <div className="col-sm-auto">
-                      <div>
-                        <Button
-                          onClick={() => {
-                            setCurrentLogo({});
-                            setBrandModal(true);
-                          }}
-                          type="button"
-                          className="btn btn-dark add-btn"
-                          id="create-btn">
-                          <i className="ri-add-line align-bottom me-1" /> Create Brand
-                        </Button>
+                    {hasPermission.includes('manage-brands.create-brand') && (
+                      <div className="col-sm-auto">
+                        <div>
+                          <Button
+                            onClick={() => {
+                              setCurrentBrand({});
+                              setBrandModal(true);
+                            }}
+                            type="button"
+                            className="btn btn-dark add-btn"
+                            id="create-btn">
+                            <i className="ri-add-line align-bottom me-1" /> Create Brand
+                          </Button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </Row>
                 </CardHeader>
                 <div className="card-body pt-0">
@@ -180,15 +224,30 @@ const ManageBrands = () => {
         </Container>
       </div>
 
-      {/* Logo Modal */}
+      {/* Brand Modal */}
       <ModalWrapper
         isOpen={brandModal}
         toggle={() => setBrandModal(false)}
-        title={Object.keys(currentLogo)?.length > 0 ? `Update ${currentLogo?.name}` : 'Create Brand'}
+        title={Object.keys(currentBrand)?.length > 0 ? `Update ${currentBrand?.name}` : 'Create Brand'}
         size="md"
         backdrop="static"
         isContentCentered={false}>
-        <BrandModal currentLogo={currentLogo} isLoading={isLoading} handleClick={handleBrand} />
+        <BrandModal currentBrand={currentBrand} isLoading={isLoading} handleClick={handleBrand} />
+      </ModalWrapper>
+
+      {/* Delete Brand Confirmation Modal */}
+      <ModalWrapper
+        isOpen={deleteBrandModal}
+        toggle={() => setDeleteBrandModal(false)}
+        title="Delete Brand"
+        backdrop="static"
+        isContentCentered={false}>
+        <ConfirmationModal
+          type="delete"
+          message="Are you sure you want to delete this brand?"
+          isLoading={isLoading}
+          handleClick={handleDeleteBrand}
+        />
       </ModalWrapper>
     </>
   );

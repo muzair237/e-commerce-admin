@@ -59,7 +59,7 @@ const rolesThunk = {
         res = await res.json();
         Toast({
           type: 'success',
-          message: 'ROle created successfully!',
+          message: 'Role created successfully!',
         });
 
         return res;

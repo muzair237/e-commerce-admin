@@ -3,7 +3,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { handleThunkError } from '@/helpers/common';
 import { Toast } from '@/components/Molecules/Toast';
 import { Fetch } from '../../helpers/fetchWrapper';
-import { GET_ALL_BRANDS, CREATE_BRAND, UPDATE_BRAND } from '../../helpers/url_helper';
+import { GET_ALL_BRANDS, CREATE_BRAND, UPDATE_BRAND, DELETE_BRAND } from '../../helpers/url_helper';
 
 const brandsThunk = {
   url: `${process.env.NEXT_PUBLIC_BRANDS_API_URL}`,
@@ -69,6 +69,26 @@ const brandsThunk = {
         Toast({
           type: 'success',
           message: 'Brand updated successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
+  deleteBrand: createAsyncThunk('brand/deleteBrand', async ({ id }) => {
+    try {
+      let res = await Fetch.delete(`${brandsThunk.url}/${DELETE_BRAND}/${id}`);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Brand deleted successfully!',
         });
 
         return res;

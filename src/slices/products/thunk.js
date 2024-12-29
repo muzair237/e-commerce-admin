@@ -13,6 +13,7 @@ import {
   CREATE_PRODUCT_VARIANT,
   UPDATE_PRODUCT_VARIANT,
   DELETE_PRODUCT_VARIANT,
+  DELETE_PRODUCT,
 } from '../../helpers/url_helper';
 
 const productsThunk = {
@@ -187,6 +188,26 @@ const productsThunk = {
         Toast({
           type: 'success',
           message: 'Variant deleted successfully!',
+        });
+
+        return res;
+      }
+      const { message } = await res.json();
+      throw new Error(message ?? 'Something Went Wrong');
+    } catch (error) {
+      handleThunkError(error);
+      throw error?.message;
+    }
+  }),
+
+  deleteProduct: createAsyncThunk('product/delete-product', async ({ id }) => {
+    try {
+      let res = await Fetch.delete(`${productsThunk.url}/${DELETE_PRODUCT}/${id}`);
+      if (res.status >= 200 && res.status < 300) {
+        res = await res.json();
+        Toast({
+          type: 'success',
+          message: 'Product deleted successfully!',
         });
 
         return res;
