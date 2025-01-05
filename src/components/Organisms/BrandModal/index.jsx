@@ -6,12 +6,12 @@ import Field from '@/components/Atoms/Field';
 import Form from '@/components/Organisms/Form/Form';
 import Button from '@/components/Atoms/Button';
 
-const BrandModal = ({ currentLogo, isLoading, handleClick }) => {
-  const { name, logo } = currentLogo;
+const BrandModal = ({ currentBrand, isLoading, handleClick }) => {
+  const { name, logo } = currentBrand;
   const [form] = useForm();
 
   useEffect(() => {
-    if (currentLogo && Object.keys(currentLogo).length > 0) {
+    if (currentBrand && Object.keys(currentBrand).length > 0) {
       form.setFieldsValue({
         name,
         logo,
@@ -41,7 +41,7 @@ const BrandModal = ({ currentLogo, isLoading, handleClick }) => {
         </div>
         <div className="mb-3">
           <Button loading={isLoading} color="primary" type="submit" className="w-100">
-            {Object.keys(currentLogo)?.length > 0 ? 'Update Brand' : 'Create Brand'}
+            {Object.keys(currentBrand)?.length > 0 ? 'Update Brand' : 'Create Brand'}
           </Button>
         </div>
       </Row>
@@ -52,7 +52,7 @@ const BrandModal = ({ currentLogo, isLoading, handleClick }) => {
 BrandModal.propTypes = {
   handleClick: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
-  currentLogo: PropTypes.shape({
+  currentBrand: PropTypes.shape({
     name: PropTypes.string,
     logo: PropTypes.string,
   }),

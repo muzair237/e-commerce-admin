@@ -55,9 +55,10 @@ export default class Field extends Component {
           } else {
             newValue = event?.target?.value?.replace(/\s{2,}/g, ' ') ?? '';
           }
+          setFieldsValue({ [name]: newValue });
+        } else {
+          setFieldsValue({ [name]: '' });
         }
-        // Update the field's value
-        setFieldsValue({ [name]: newValue });
       },
     };
   };

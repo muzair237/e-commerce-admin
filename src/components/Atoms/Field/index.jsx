@@ -1,8 +1,9 @@
 import React, { useState, forwardRef } from 'react';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 import { Input } from 'reactstrap';
+
 import UploadFile from '@/components/Molecules/UploadFile';
+import ReactSelect from '@/components/Organisms/ReactSelect';
 import TogglePasswordIcon from '../TogglePasswordIcon';
 import { StyledInput, Error, InputWrapper } from './Field.styles';
 import Label from '../Label';
@@ -73,18 +74,10 @@ const Field = forwardRef(
               </Label>
             </div>
           ) : type === 'select' ? (
-            <Select
+            <ReactSelect
               placeholder="Select..."
-              styles={{
-                control: provided => ({
-                  ...provided,
-                  borderColor: isError ? 'red' : provided.borderColor,
-                  transition: 'border-color 0.5s ease',
-                }),
-              }}
               isClearable={isClearable}
               isDisabled={disabled}
-              ref={ref}
               name={name}
               options={options}
               {...props}

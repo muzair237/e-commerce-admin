@@ -5,6 +5,7 @@ import { Row, Col } from 'reactstrap';
 
 import { convertToFormData, handleApiCall, prepareProductFiltersData, traverseAndModifyObject } from '@/helpers/common';
 import productsThunk from '@/slices/products/thunk';
+import helperService from '@/services/helperAPIService';
 import Field from '@/components/Atoms/Field';
 import ModalWrapper from '@/components/Molecules/ModalWrapper';
 import Button from '@/components/Atoms/Button';
@@ -65,6 +66,20 @@ const ProductModal = ({ product, closeMe }) => {
     }
   };
 
+  const loadBrands = async searchText => {
+    try {
+      const items = await helperService.getAllBrands({ searchText, getAll: true });
+
+      const options = items?.map(_ => ({ value: _?.id, label: _?.name }));
+
+      return options;
+    } catch (error) {
+      console.error('Error loading brands:', error);
+
+      return [];
+    }
+  };
+
   useEffect(() => {
     dispatch(productsThunk.getProductFilterOptions());
   }, []);
@@ -103,7 +118,9 @@ const ProductModal = ({ product, closeMe }) => {
                   name="brandId"
                   placeholder="Brand"
                   type="select"
-                  options={brandOptions}
+                  async
+                  defaultOptions={brandOptions}
+                  loadOptions={loadBrands}
                   rules={[{ required: true }]}>
                   <Field />
                 </Form.Item>
@@ -129,7 +146,6 @@ const ProductModal = ({ product, closeMe }) => {
                 maxFiles={4}
                 displayFile={images || null}
                 type="file"
-                options={screenSizeOptions}
                 rules={[{ required: true }]}>
                 <Field />
               </Form.Item>

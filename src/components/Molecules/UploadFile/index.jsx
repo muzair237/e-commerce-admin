@@ -20,6 +20,7 @@ const UploadFile = ({
   displayFile,
   ...props
 }) => {
+  const [originalFiles, setOriginalFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleChange = files => {
@@ -62,7 +63,8 @@ const UploadFile = ({
     }));
 
     if (multiple) {
-      onChange(files);
+      setOriginalFiles([...originalFiles, ...files]);
+      onChange([...originalFiles, ...files]);
     } else {
       onChange(files[0]);
     }
@@ -88,10 +90,17 @@ const UploadFile = ({
     setSelectedFiles(prevFiles => {
       const updatedFiles = prevFiles.filter(file => file.preview !== fileToDelete.preview);
 
-      onChange(updatedFiles.length > 0 ? updatedFiles : null);
-
       return updatedFiles;
     });
+
+    if (multiple) {
+      setOriginalFiles(prevFiles => {
+        const updatedFiles = prevFiles.filter(file => file !== fileToDelete.preview);
+        onChange(updatedFiles.length > 0 ? updatedFiles : null);
+
+        return updatedFiles;
+      });
+    }
   };
 
   useEffect(() => {
@@ -109,6 +118,7 @@ const UploadFile = ({
           ];
 
       setSelectedFiles(newFiles);
+      setOriginalFiles(displayFile);
     }
   }, [displayFile, multiple]);
 

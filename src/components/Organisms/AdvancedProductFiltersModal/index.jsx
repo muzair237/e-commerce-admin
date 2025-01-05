@@ -14,6 +14,7 @@ import { manageProductsColumns } from '@/common/columns';
 import { clearAdvancedSearchProducts } from '@/slices/products/reducer';
 import { UtilsContext } from '@/contexts/utilsContext';
 import { amountRegex } from '@/helpers/regexes';
+import brandsThunk from '@/slices/brands/thunk';
 import Field from '@/components/Atoms/Field';
 import Button from '@/components/Atoms/Button';
 import TableContainer from '@/components/Common/TableContainer';
@@ -24,6 +25,7 @@ import ProductVariantModal from '../ProductVariantModal';
 import ProductVariants from '../ViewProductVariantsModal';
 import ProductImages from '../ProductImagesModal';
 import CreateProductModal from '../ProductModal';
+import helperService from '@/services/helperAPIService';
 
 const AdvancedProductFilter = () => {
   const dispatch = useDispatch();
@@ -86,6 +88,20 @@ const AdvancedProductFilter = () => {
       console.log('Error in performing advanced product search: ', error.message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadBrands = async searchText => {
+    try {
+      const items = await helperService.getAllBrands({ searchText, getAll: true });
+
+      const options = items?.map(_ => ({ value: _?.id, label: _?.name }));
+
+      return options;
+    } catch (error) {
+      console.error('Error loading brands:', error);
+
+      return [];
     }
   };
 
@@ -234,7 +250,14 @@ const AdvancedProductFilter = () => {
                 </Form.Item>
               </Col>
               <Col>
-                <Form.Item label="Brand" type="select" name="brand" placeholder="Select" options={brandOptions}>
+                <Form.Item
+                  label="Brand"
+                  type="select"
+                  name="brand"
+                  async
+                  placeholder="Select"
+                  defaultOptions={brandOptions}
+                  loadOptions={loadBrands}>
                   <Field />
                 </Form.Item>
               </Col>
